@@ -1,0 +1,412 @@
+ Duane Syndrome Global Portal - Implementation Plan                                                                                                                                   
+                                                 
+ Context                             
+
+ Building a comprehensive global portal for Duane Syndrome at duane-syndrome.com / duane.life. The site will serve patients, parents, and friends worldwide with medical information,
+  community resources, interactive tools, a specialist directory, and community-contributed content. It must be multilingual (English + Hebrew minimum), mobile-first, SEO-optimized,
+  and low-maintenance. Budget: ~$0-20/month.
+
+ ---
+ Tech Stack
+
+ ┌─────────────────┬──────────────────────────────────────────┬──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+ │      Layer      │                  Choice                  │                                                       Why                                                        │
+ ├─────────────────┼──────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │ Framework       │ Next.js 16 (App Router, React 19)        │ SSG/ISR for content, Server Components for zero-JS pages, Client Components for interactive tools, Server        │
+ │                 │                                          │ Actions for forms, Turbopack stable                                                                              │
+ ├─────────────────┼──────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │ CMS             │ Sanity (free tier: 3 users, 500K req/mo) │ Visual editor for blog posts, embeds in app at /admin, field-level i18n, portable text handles RTL/Hebrew        │
+ │                 │                                          │ natively                                                                                                         │
+ ├─────────────────┼──────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │ Database        │ Turso/LibSQL + Drizzle ORM (free: 9GB,   │ For dynamic data: users, reviews, comments, mentor posts, subscribers, research cache                            │
+ │                 │ 500M reads/mo)                           │                                                                                                                  │
+ ├─────────────────┼──────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │ Auth            │ Auth.js (NextAuth v5) with Google +      │ Social login for community features (mentor board, submissions, reviews). Minimal friction.                      │
+ │                 │ Facebook OAuth                           │                                                                                                                  │
+ ├─────────────────┼──────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │ Styling         │ Tailwind CSS v4                          │ RTL support via rtl: variants, CSS logical properties, design tokens for soft/positive color palette             │
+ ├─────────────────┼──────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │ i18n            │ next-intl                                │ App Router native, ~2KB, handles RTL routing, plurals, date formatting                                           │
+ ├─────────────────┼──────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │ Email           │ Resend (free: 3K emails/mo)              │ Subscriber notifications, React-based email templates matching site design                                       │
+ ├─────────────────┼──────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │ Search          │ Pagefind (static, build-time)            │ Zero-cost client-side search, multilingual support, ~50KB bundle                                                 │
+ ├─────────────────┼──────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │ Analytics       │ Plausible self-hosted (free) or Umami    │ Privacy-friendly, no cookie banners (important for medical site)                                                 │
+ │                 │ (free)                                   │                                                                                                                  │
+ ├─────────────────┼──────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │ Hosting         │ Vercel (free Hobby: 100GB BW)            │ Seamless Next.js integration, ISR, preview deploys, built-in Web Vitals                                          │
+ ├─────────────────┼──────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │ CI/CD           │ GitHub Actions (free for public repos)   │ Cron jobs for research fetching, build/deploy pipeline                                                           │
+ ├─────────────────┼──────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+ │ AI              │ Google Gemini API (free tier: 1500       │ Summarize PubMed abstracts at 3 reading levels. Gemini excels at academic/scientific text comprehension. Free    │
+ │ Summarization   │ req/day)                                 │ tier is more than enough for ~5 papers/month.                                                                    │
+ └─────────────────┴──────────────────────────────────────────┴──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+ Total estimated cost: $0-9/month (domain ~$12/year, optional analytics ~$9/mo, Gemini AI free tier)
+
+ ---
+ Project Structure
+
+ duane/
+ ├── app/
+ │   ├── [locale]/                    # Locale-prefixed routes (/en/..., /he/...)
+ │   │   ├── layout.tsx               # Root layout: fonts, RTL dir, nav, footer
+ │   │   ├── page.tsx                 # Home: hero, persona selector, featured content
+ │   │   ├── about/
+ │   │   │   ├── page.tsx             # Overview pillar page
+ │   │   │   ├── types/page.tsx       # Type 1, 2, 3 explained
+ │   │   │   ├── treatments/page.tsx  # Conventional + alternative treatments
+ │   │   │   └── faq/page.tsx         # FAQ with schema.org FAQPage
+ │   │   ├── blog/
+ │   │   │   ├── page.tsx             # Blog listing
+ │   │   │   └── [slug]/page.tsx      # Individual post + comments
+ │   │   ├── research/page.tsx        # Auto-updated research feed
+ │   │   ├── specialists/
+ │   │   │   ├── page.tsx             # Directory with country filter
+ │   │   │   └── [id]/page.tsx        # Detail + reviews
+ │   │   ├── tools/
+ │   │   │   ├── gaze-simulator/page.tsx
+ │   │   │   └── screening/page.tsx   # Guided diagnostic screening
+ │   │   ├── community/
+ │   │   │   ├── page.tsx             # External community links
+ │   │   │   ├── mentors/page.tsx     # Mentor/mentee board
+ │   │   │   ├── stories/page.tsx     # Success stories
+ │   │   │   └── spotlight/page.tsx   # Known people + resources
+ │   │   ├── life-hacks/page.tsx      # Tips by persona (patient/parent/friend)
+ │   │   ├── legal/page.tsx           # Wiki-style legal info by country
+ │   │   ├── submit/page.tsx          # Contribute content (specialist/story/blog/sponsor)
+ │   │   └── subscribe/page.tsx       # Newsletter signup
+ │   ├── api/
+ │   │   ├── auth/[...nextauth]/route.ts  # Auth.js endpoints
+ │   │   ├── cron/
+ │   │   │   └── fetch-research/route.ts  # PubMed cron endpoint
+ │   │   ├── webhooks/
+ │   │   │   └── sanity/route.ts          # Content publish notifications
+ │   │   └── subscribe/route.ts           # Subscription management
+ │   └── admin/[[...index]]/page.tsx      # Embedded Sanity Studio
+ ├── components/
+ │   ├── ui/                          # Shared: Button, Card, Modal, Form, etc.
+ │   ├── layout/                      # Header, Footer, Nav, LocaleSwitcher, PersonaSelector
+ │   ├── gaze-simulator/             # Canvas-based eye movement simulator
+ │   ├── screening/                  # Diagnostic screening wizard
+ │   └── content/                    # PortableText renderers, ArticleCard, ResearchCard
+ ├── lib/
+ │   ├── sanity/                     # Client, queries (GROQ), image helpers
+ │   ├── db/                         # Turso client, Drizzle schema & queries
+ │   ├── auth/                       # Auth.js config (Google + Facebook providers)
+ │   ├── email/                      # Resend client + React Email templates
+ │   ├── research/                   # PubMed API client + AI summarization
+ │   └── i18n/                       # next-intl config, request locale helpers
+ ├── messages/
+ │   ├── en.json                     # English translations
+ │   └── he.json                     # Hebrew translations
+ ├── sanity/
+ │   └── schemas/                    # Blog, MedicalPage, Specialist, Research, Story, etc.
+ ├── .github/
+ │   └── workflows/
+ │       └── fetch-research.yml      # Daily PubMed cron
+ ├── middleware.ts                    # next-intl locale routing
+ ├── tailwind.config.ts
+ ├── drizzle.config.ts
+ └── next.config.ts
+
+ ---
+ Database Schema (Turso/Drizzle)
+
+ users           (id, name, email, image, provider, anonymous_alias, created_at)
+ subscribers     (id, email, name, locale, preferences_json, confirmed, created_at)
+ specialists     (id, name, country, city, type[adult|child|both], specialty, website, phone, verified, rating_avg, rating_count, created_at)
+ reviews         (id, specialist_id, user_id, rating, text, created_at, approved)
+ comments        (id, page_slug, user_id, text, created_at, approved)
+ stories         (id, user_id, title, profession, content, locale, created_at, approved)
+ mentor_posts    (id, user_id, role[mentor|mentee], bio, contact_method, anonymous, locale, active, created_at)
+ legal_entries   (id, user_id, country, topic, content, sources_json, locale, created_at, approved)
+ research_cache  (id, pubmed_id, title, abstract, authors, journal, published_date, ai_summary_simple, ai_summary_adult, ai_summary_professional, fetched_at)
+ submissions     (id, user_id, type[specialist|blog|sponsor|spotlight], data_json, status[pending|approved|rejected], created_at)
+
+ ---
+ Sanity CMS Schemas
+
+ - blogPost: title, slug, author, body (portable text), excerpt, featured_image, tags, locale, reading_level, seo_fields
+ - medicalPage: title, slug, body, sources, schema_type, locale, last_reviewed_date
+ - communityLink: name, url, platform, description, og_image, og_title, member_count, locale
+ - spotlightPerson: name, image, profession, bio, syndrome_type, social_links, locale
+ - resource: name, url, type[youtube|blog|magazine|channel], description, locale
+
+ ---
+ Feature List (Ordered by Implementation Priority)
+
+ Each feature is standalone and deployable. Features build on each other logically.
+
+ Phase 1: Foundation
+
+ F01 - Project Scaffolding & Dev Setup
+ - Initialize Next.js 16 with App Router (React 19), TypeScript, Tailwind CSS v4, ESLint, Turbopack
+ - Configure next-intl with English + Hebrew, RTL support
+ - Set up middleware for locale detection/routing
+ - Create base layout with responsive shell (header, footer, nav placeholder)
+ - Configure Vercel deployment from GitHub
+ - Add robots.txt, basic sitemap, favicon/metadata
+ - Deploys: Empty but functional bilingual site at the domain
+
+ F02 - Design System & UI Components
+ - Define color palette (soft, empowering: teal/coral/warm neutrals with good contrast)
+ - Typography: accessible font pairing that supports Latin + Hebrew glyphs
+ - Build shared UI kit: Button, Card, Input, Modal, Badge, Skeleton, Toast
+ - Responsive navigation with mobile hamburger menu
+ - Locale switcher component
+ - Dark/light mode (optional, light default)
+ - Deploys: Polished, empty shell with consistent design language
+
+ F03 - Home Page & Persona Selector
+ - Hero section: empowering message, what Duane Syndrome is in one sentence
+ - Persona selector: "I have Duane Syndrome" / "I'm a parent" / "I'm a friend/family"
+ - Store persona choice in cookie/localStorage, adjust content throughout site
+ - Featured content cards (blog posts, latest research, community spotlight)
+ - Quick links to key sections
+ - Newsletter signup inline CTA
+ - Deploys: Welcoming entry point that routes users to relevant content
+
+ Phase 2: Content Foundation
+
+ F04 - Sanity CMS Integration & Blog System
+ - Set up Sanity project, define blogPost + author schemas
+ - Embed Sanity Studio at /admin with auth
+ - Blog listing page with pagination, tag filtering, locale filtering
+ - Individual blog post page with portable text rendering
+ - ISR: revalidate on Sanity webhook
+ - Reading time estimate
+ - SEO: Open Graph images via @vercel/og, structured data (Article schema)
+ - Deploys: Admin can create/publish blog posts, SEO-optimized
+
+ F05 - Medical Information Pages (About Duane)
+ - Sanity schema: medicalPage with sections, sources, last-reviewed date
+ - Pages: Overview, Types (1/2/3), Symptoms, Diagnosis, Treatments (conventional + alternative)
+ - Treatments subsections: prism glasses, eye patches, surgery options, vision therapy, botox
+ - Health organization recommendations (AAO, AAPOS, etc.)
+ - FAQ page with schema.org FAQPage markup
+ - Schema.org MedicalCondition + MedicalWebPage structured data
+ - Breadcrumb navigation with BreadcrumbList schema
+ - Deploys: Comprehensive medical reference section
+
+ F06 - Community Submissions & Moderation
+ - Turso database setup with Drizzle ORM
+ - Auth.js integration (Google + Facebook OAuth)
+ - Generic submission form: type (specialist/blog/sponsor/spotlight), data, captcha-free (honeypot)
+ - Submission stored in DB with status: pending/approved/rejected
+ - Admin moderation page at /admin/submissions or within Sanity
+ - Email notification to admin on new submission via Resend
+ - Anonymous option: users can choose a generated alias
+ - Deploys: Anyone can submit content, admin reviews before publishing
+
+ Phase 3: Community & Directory
+
+ F07 - Specialist/Surgeon Directory
+ - Specialist listing page with filters: country, city, adult/child/both, specialty
+ - Map view (optional, use Leaflet - free) or list view
+ - Specialist detail page with contact info, website link
+ - "Suggest a Specialist" form (uses F06 submission system)
+ - Schema.org Physician/MedicalOrganization markup
+ - Deploys: Searchable specialist directory filtered by country
+
+ F08 - Specialist Reviews & Ratings
+ - Star rating (1-5) + text review on specialist detail pages
+ - Requires social login (Auth.js)
+ - Average rating displayed on listing cards
+ - Admin moderation for reviews (flag inappropriate content)
+ - Review count and date displayed
+ - Deploys: Community-driven specialist recommendations
+
+ F09 - Community Links & Resources Hub
+ - Sanity schemas: communityLink, resource
+ - Community page: Facebook groups, Reddit communities, forums, organizations
+ - OG metadata scraping at build time for preview cards (title, description, image)
+ - Resource page: YouTube channels, blogs, magazines with direct links
+ - Filter by platform type
+ - Deploys: Curated directory of external Duane Syndrome communities
+
+ F10 - Celebrity Spotlight & Known People
+ - Sanity schema: spotlightPerson
+ - Gallery/card layout with photo, name, profession, brief bio
+ - Link to interviews/posts where they discuss Duane Syndrome
+ - Filter by profession or syndrome type
+ - Deploys: Inspiring showcase of public figures with Duane Syndrome
+
+ Phase 4: Dynamic & Interactive Features
+
+ F11 - Research Feed Automation
+ - PubMed E-utilities API integration (search: "Duane syndrome" OR "Duane retraction syndrome")
+ - GitHub Actions daily cron: fetch new papers, store in Turso research_cache
+ - AI summarization via Gemini API: 3 levels per abstract (kids-friendly, adult, professional)
+ - Research listing page with year/topic filter
+ - Auto-create Sanity draft documents for admin curation
+ - "New research" notification to subscribers
+ - Deploys: Auto-updating research section with AI summaries
+
+ F12 - Subscriber & Notification System
+ - Subscribe form with email, name, locale, content preferences (research/blog/community)
+ - Double opt-in confirmation email via Resend
+ - Sanity webhook triggers notification on content publish
+ - Locale-specific email templates (English + Hebrew)
+ - Unsubscribe link in every email
+ - Subscriber management in admin
+ - Deploys: Working email notification pipeline
+
+ F13 - Interactive Gaze Simulator
+ - React Client Component with HTML5 Canvas
+ - 3D-ish eye model showing iris/pupil position
+ - Controls: gaze direction slider (left ↔ right), Duane type selector (1/2/3), severity
+ - Side-by-side: "How it looks from outside" vs "How the person sees"
+ - Show normal eye movement comparison
+ - Visual indicator of co-contraction (globe retraction) and upshoot/downshoot
+ - Shareable link with params (for explaining to teachers, doctors)
+ - Mobile-friendly touch controls
+ - Medical disclaimer
+ - Deploys: Unique educational tool, viral/share potential
+
+ F14 - Diagnostic Screening Tool
+ - Step-by-step guided questionnaire (Client Component)
+ - Illustrate eye positions: "Look left / right / up / down - which looks like yours?"
+ - Visual selection with eye diagrams
+ - Result: likely Duane type, or "this might not be Duane - see a specialist"
+ - Related conditions mention (Moebius, Brown syndrome, etc.)
+ - Strong disclaimer: "This is not a medical diagnosis"
+ - Recommend specialist from directory (link to F07)
+ - Printable summary to bring to doctor
+ - Deploys: Helpful pre-visit tool, drives traffic to specialist directory
+
+ Phase 5: Life Content & Persona-Specific Features
+
+ F15 - Life Hacks & Tips Section
+ - Persona-filtered content: shows different tips based on stored persona (patient/parent/friend)
+ - Categories: School/kindergarten, Driving, Sports, Workplace, Equipment, Social situations
+ - Subcategories: seating position, bullying/mocking response scripts, explaining to teachers
+ - Sanity-managed content with persona tags
+ - Community can suggest tips via submission form (F06)
+ - Deploys: Practical daily-life resource personalized by reader type
+
+ F16 - Success Stories
+ - Submission form: name (or anonymous), profession, story, optional photo
+ - Story cards grouped by profession category (pilot, actor, surgeon, athlete, etc.)
+ - Requires social login, moderation before publish
+ - Heart/reaction system (stored in Turso)
+ - Deploys: Empowering section showing Duane doesn't limit careers
+
+ F17 - Mentor/Mentee Board
+ - Social login required (Google/Facebook via Auth.js)
+ - Post creation: role (mentor/mentee), brief bio, what they offer/seek, contact preference
+ - Option to display anonymously (generated alias, no photo)
+ - Contact method: "Send me an email" (masked relay) or "DM me on [platform]"
+ - Active/inactive toggle for listings
+ - Locale and country tags for matching
+ - Deploys: Connection platform for peer support
+
+ F18 - Legal & Rights Wiki
+ - Country-organized legal information: disability rights, insurance, military service, driving license, school accommodations
+ - Community-contributed with moderation (uses Auth.js + F06 pipeline)
+ - Each entry requires source links to official resources
+ - Disclaimer: "This is community-contributed information, not legal advice"
+ - Search and filter by country + topic
+ - Deploys: Crowdsourced legal resource with official source links
+
+ Phase 6: Blog Enhancement & Comments
+
+ F19 - Blog Comments & Reactions
+ - Comment system on blog posts (Turso-backed)
+ - Requires social login
+ - Threaded replies (1 level deep)
+ - Emoji reactions on posts (heart, helpful, inspiring)
+ - Moderation: auto-approve verified users, hold new users for review
+ - Deploys: Engaged blog readership with discussions
+
+ F20 - Community Blog Submissions
+ - "Write for us" page: submission form for guest blog posts
+ - Rich text editor (simplified portable text or Markdown)
+ - Admin review + edit in Sanity Studio before publish
+ - Author credit with optional profile link
+ - Deploys: Scaled content creation from community
+
+ Phase 7: Polish & Growth
+
+ F21 - Full-Text Search
+ - Pagefind integration: indexes all static pages at build time
+ - Search modal accessible from nav bar (Cmd+K / Ctrl+K)
+ - Multilingual search (indexes both English and Hebrew content)
+ - Search results grouped by section (blog, research, specialists, etc.)
+ - Deploys: Users can find anything across the entire site
+
+ F22 - Analytics & SEO Audit
+ - Plausible Analytics (self-hosted on a $5 VPS, or Umami free)
+ - Google Search Console setup for both domains
+ - Bing Webmaster Tools registration
+ - Final sitemap audit (hreflang tags for all locales)
+ - Core Web Vitals optimization pass
+ - WCAG 2.1 AA accessibility audit
+ - Performance budget: <2s LCP, <100ms FID, <0.1 CLS
+ - Deploys: Full visibility into traffic and SEO performance
+
+ F23 - Additional Languages
+ - Add Spanish, French, Arabic, Portuguese, German, Russian, Chinese
+ - Translation workflow: English as source → export JSON → translate → import
+ - Consider community translation contributions
+ - Auto-detect browser locale, offer to switch
+ - RTL support already built (Hebrew), extends to Arabic
+ - Deploys: True global reach
+
+ ---
+ Additional Ideas (Not in Original Request)
+
+ 1. "Ask a Question" Forum / Q&A - Simple question board where community answers each other (lower priority, could replace with linking to existing Reddit/Facebook)
+ 2. Printable One-Pager - Generate a PDF "about my condition" card that kids/parents can give to teachers, coaches, new doctors. Customizable with their Duane type.
+ 3. Eye Exercise Tracker - If vision therapy exercises are recommended, a simple daily tracker/reminder tool
+ 4. Yearly Survey / Data Collection - Annual anonymous survey collecting Duane Syndrome demographics (type distribution, surgery rates, satisfaction) to build a community dataset
+ 5. Podcast Feed - Aggregate and list podcasts that have discussed Duane Syndrome
+ 6. Emergency Card - Digital/printable medical ID card noting the condition (useful for ER visits where misdiagnosis can occur)
+ 7. "Explain to My..." Templates - Pre-written scripts to explain Duane Syndrome to: teacher, coach, employer, date, doctor unfamiliar with it. Customizable with the user's specific
+  type.
+ 8. Age-Appropriate Content Tracks - In addition to persona (patient/parent/friend), filter content by age group: toddler, school-age, teen, adult. Especially for life hacks and
+ coping strategies.
+
+ ---
+ Hosting & Deployment Setup
+
+ 1. Vercel: Connect GitHub repo → auto-deploy on push to main, preview deploys on PRs
+ 2. Domain: Point duane-syndrome.com and duane.life to Vercel (CNAME/A records). Use duane-syndrome.com as primary (better for SEO - descriptive domain), duane.life redirects to it
+ 3. Sanity: Create project at sanity.io, free plan. Studio embedded in app.
+ 4. Turso: Create database at turso.tech, free plan. Get connection URL + auth token for Vercel env vars.
+ 5. Auth.js: Register OAuth apps at Google Cloud Console + Facebook Developer Portal. Add client IDs/secrets to Vercel env vars.
+ 6. Resend: Create account, verify domain for sending. Add API key to Vercel env vars.
+ 7. GitHub Actions: Add secrets for PubMed API key (free from NCBI), Gemini API key (free tier from Google AI Studio), Turso credentials.
+
+ Environment Variables (Vercel)
+
+ NEXT_PUBLIC_SANITY_PROJECT_ID, NEXT_PUBLIC_SANITY_DATASET
+ SANITY_API_TOKEN
+ TURSO_DATABASE_URL, TURSO_AUTH_TOKEN
+ AUTH_SECRET, AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET, AUTH_FACEBOOK_ID, AUTH_FACEBOOK_SECRET
+ RESEND_API_KEY
+ GEMINI_API_KEY
+ CRON_SECRET
+
+ ---
+ SEO Strategy
+
+ - Primary domain: duane-syndrome.com (descriptive, keyword-rich)
+ - Schema.org markup on every page: MedicalCondition, MedicalWebPage, FAQPage, Article, Physician, BreadcrumbList
+ - Sitemap: auto-generated per locale via next-sitemap
+ - Hreflang tags: on every page linking English ↔ Hebrew (and future languages)
+ - OG images: auto-generated branded images via @vercel/og
+ - Pillar content strategy: comprehensive 2-5K word pages targeting "Duane syndrome [topic]" keywords
+ - Freshness signals: auto-updated research feed, regular blog posts
+ - Google Search Console: submit sitemaps for both domains, monitor indexing
+ - Structured data testing: validate with Google Rich Results Test before each feature launch
+
+ ---
+ Verification & Testing Strategy
+
+ - Per feature: Manual QA on desktop + mobile (iOS Safari, Android Chrome), both English and Hebrew
+ - Automated: Playwright E2E tests for critical flows (subscribe, submit content, search)
+ - Lighthouse CI: Run in GitHub Actions, fail build if performance/accessibility drops below thresholds
+ - Content preview: Sanity preview mode for draft content before publishing
+ - Staging: Vercel preview deploys serve as staging for every PR

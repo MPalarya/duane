@@ -1,0 +1,17 @@
+name: Fetch Research Papers
+
+on:
+  schedule:
+    # Run daily at 6:00 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  fetch-research:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger research fetch
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/fetch-research"

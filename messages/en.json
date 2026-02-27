@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "title": "Duane Syndrome - Global Information & Community Portal",
+    "description": "Comprehensive resource for Duane Syndrome patients, parents, and friends. Medical information, specialist directory, community support, and interactive tools."
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About Duane",
+    "types": "Types",
+    "treatments": "Treatments",
+    "faq": "FAQ",
+    "blog": "Blog",
+    "research": "Research",
+    "specialists": "Specialists",
+    "tools": "Tools",
+    "gazeSimulator": "Gaze Simulator",
+    "screening": "Screening Tool",
+    "onePager": "My DS Card",
+    "explainTemplates": "Explain Templates",
+    "emergencyCard": "Emergency Card",
+    "exerciseTracker": "Exercise Tracker",
+    "community": "Community",
+    "mentors": "Mentors",
+    "stories": "Stories",
+    "spotlight": "Spotlight",
+    "lifeHacks": "Life Hacks",
+    "legal": "Legal Info",
+    "submit": "Contribute",
+    "subscribe": "Subscribe"
+  },
+  "home": {
+    "hero": {
+      "title": "You're Not Alone",
+      "subtitle": "The global community for Duane Syndrome — connect, learn, and thrive.",
+      "description": "Duane Syndrome is a rare eye movement condition affecting about 1 in 1,000 people. Whether you have it, love someone who does, or want to understand it — you're in the right place."
+    },
+    "persona": {
+      "title": "I am...",
+      "patient": "A person with Duane Syndrome",
+      "patientDesc": "Tips, community, and tools for living your best life",
+      "parent": "A parent or caregiver",
+      "parentDesc": "Guidance, specialists, and support for your child",
+      "friend": "A friend, family member, or educator",
+      "friendDesc": "Understand Duane Syndrome and how to be supportive"
+    },
+    "featured": {
+      "title": "Featured",
+      "latestResearch": "Latest Research",
+      "communitySpotlight": "Community Spotlight",
+      "readMore": "Read more"
+    },
+    "cta": {
+      "newsletter": "Stay updated — join our newsletter",
+      "emailPlaceholder": "your@email.com",
+      "subscribeButton": "Subscribe"
+    }
+  },
+  "common": {
+    "learnMore": "Learn more",
+    "readMore": "Read more",
+    "backToHome": "Back to home",
+    "share": "Share",
+    "search": "Search",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "disclaimer": "This information is for educational purposes only and should not replace professional medical advice."
+  },
+  "footer": {
+    "tagline": "Empowering the Duane Syndrome community worldwide",
+    "about": "About this site",
+    "aboutText": "A free, open-source resource built by and for the Duane Syndrome community.",
+    "quickLinks": "Quick Links",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "contact": "Contact",
+    "copyright": "Duane Syndrome Portal. Open source."
+  }
+}

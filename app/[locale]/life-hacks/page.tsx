@@ -1,0 +1,46 @@
+import { setRequestLocale } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/lib/i18n/navigation';
+import { LifeHacksContent } from '@/components/content/life-hacks-content';
+
+export default async function LifeHacksPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  return <PageContent />;
+}
+
+function PageContent() {
+  const t = useTranslations('nav');
+
+  return (
+    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+      <nav className="mb-6 text-sm text-warm-400">
+        <Link href="/" className="hover:text-primary-600">Home</Link>
+        <span className="mx-2">/</span>
+        <span className="text-warm-600">{t('lifeHacks')}</span>
+      </nav>
+
+      <h1 className="text-3xl font-bold text-warm-900">{t('lifeHacks')}</h1>
+      <p className="mt-4 text-warm-600">
+        Practical tips for daily life with Duane Syndrome, personalized for your situation.
+        Select your perspective to see the most relevant tips.
+      </p>
+
+      <LifeHacksContent />
+
+      <div className="mt-10 rounded-xl border border-primary-200 bg-primary-50 p-6 text-center">
+        <p className="text-primary-800">Have a tip that helped you?</p>
+        <Link
+          href="/submit"
+          className="mt-2 inline-block text-primary-600 font-medium hover:underline"
+        >
+          Share it with the community
+        </Link>
+      </div>
+    </div>
+  );
+}
