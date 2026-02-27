@@ -6,8 +6,9 @@ import { schemaTypes } from './sanity/schemas';
 export default defineConfig({
   name: 'duane-syndrome',
   title: 'Duane Syndrome Portal',
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'placeholder',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  basePath: '/admin',
   plugins: [structureTool(), visionTool()],
   schema: {
     types: schemaTypes,
