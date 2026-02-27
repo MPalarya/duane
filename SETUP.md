@@ -150,54 +150,26 @@ After redeploying, visit `https://duane-syndrome.com/admin` — you should see t
 
 ---
 
-## Step 6: Set Up Auth.js / OAuth (Free)
+## Step 6: Set Up Clerk Auth (Free: 10,000 monthly active users)
 
-### Google OAuth
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project: `Duane Syndrome Portal`
-3. Go to **APIs & Services > OAuth consent screen**
-   - User Type: **External**
-   - App name: `Duane Syndrome Portal`
-   - Support email: your email
-   - Authorized domains: `duane-syndrome.com`
-   - Save
-4. Go to **APIs & Services > Credentials > Create Credentials > OAuth 2.0 Client ID**
-   - Application type: **Web application**
-   - Name: `Duane Portal Web`
-   - Authorized redirect URIs:
-     - `https://duane-syndrome.com/api/auth/callback/google`
-     - `http://localhost:3000/api/auth/callback/google` (for dev)
-   - Copy the **Client ID** and **Client Secret**
+Clerk handles Google + Facebook login for you — no need to register OAuth apps separately.
 
-### Facebook OAuth
-1. Go to [Facebook Developers](https://developers.facebook.com/)
-2. Click **My Apps > Create App**
-   - Type: **Consumer**
-   - Name: `Duane Syndrome Portal`
-3. Under **Facebook Login > Settings**:
-   - Valid OAuth Redirect URIs:
-     - `https://duane-syndrome.com/api/auth/callback/facebook`
-     - `http://localhost:3000/api/auth/callback/facebook`
-4. Go to **Settings > Basic**
-   - Copy **App ID** and **App Secret**
-5. Toggle app to **Live** mode (under the app toggle at top)
-
-### Generate AUTH_SECRET
-```bash
-openssl rand -base64 32
-# or
-npx auth secret
-```
+1. Go to [clerk.com](https://clerk.com/) and create a free account
+2. Create a new application: `Duane Syndrome Portal`
+3. In the setup wizard, enable **Google** and **Facebook** as sign-in options (just toggle them on — Clerk handles the OAuth setup)
+4. Go to **API Keys** in the Clerk dashboard
+5. Copy:
+   - **Publishable key** (starts with `pk_live_` or `pk_test_`)
+   - **Secret key** (starts with `sk_live_` or `sk_test_`)
 
 ### Add to Vercel Environment Variables:
 
 | Variable | Value |
 |----------|-------|
-| `AUTH_SECRET` | Generated random string |
-| `AUTH_GOOGLE_ID` | Google OAuth Client ID |
-| `AUTH_GOOGLE_SECRET` | Google OAuth Client Secret |
-| `AUTH_FACEBOOK_ID` | Facebook App ID |
-| `AUTH_FACEBOOK_SECRET` | Facebook App Secret |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Your publishable key |
+| `CLERK_SECRET_KEY` | Your secret key |
+
+That's it — no Google Cloud Console, no Facebook Developer Portal, no redirect URIs to configure.
 
 ---
 
@@ -341,7 +313,7 @@ npm run dev
 | Vercel | Hobby (Free) | $0/month |
 | Sanity CMS | Free | $0/month |
 | Turso DB | Free (9GB, 500M reads) | $0/month |
-| Auth.js | Open source | $0/month |
+| Clerk Auth | Free (10K MAU) | $0/month |
 | Resend | Free (3K emails/mo) | $0/month |
 | Gemini AI | Free (1,500 req/day) | $0/month |
 | GitHub Actions | Free (public repos) | $0/month |

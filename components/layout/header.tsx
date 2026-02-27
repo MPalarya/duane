@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/lib/i18n/navigation';
 import { LocaleSwitcher } from './locale-switcher';
+import { AuthButtons } from './auth-buttons';
 
 export function Header() {
   const t = useTranslations('nav');
@@ -91,10 +92,12 @@ export function Header() {
           </div>
 
           <LocaleSwitcher />
+          <AuthButtons />
         </nav>
 
         {/* Mobile menu button */}
         <div className="flex items-center gap-2 lg:hidden">
+          <AuthButtons size="sm" />
           <LocaleSwitcher />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

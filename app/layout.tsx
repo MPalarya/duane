@@ -1,11 +1,20 @@
+import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css';
 
-// This root layout only provides the global CSS import.
-// The actual HTML structure is in app/[locale]/layout.tsx.
+const isClerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  if (!isClerkConfigured) {
+    return children;
+  }
+
+  return (
+    <ClerkProvider>
+      {children}
+    </ClerkProvider>
+  );
 }

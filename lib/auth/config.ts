@@ -1,29 +1,12 @@
-import NextAuth from 'next-auth';
-import Google from 'next-auth/providers/google';
-import Facebook from 'next-auth/providers/facebook';
-
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  secret: process.env.AUTH_SECRET || 'dev-secret-change-in-production',
-  providers: [
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID ?? '',
-      clientSecret: process.env.AUTH_GOOGLE_SECRET ?? '',
-    }),
-    Facebook({
-      clientId: process.env.AUTH_FACEBOOK_ID ?? '',
-      clientSecret: process.env.AUTH_FACEBOOK_SECRET ?? '',
-    }),
-  ],
-  pages: {
-    signIn: '/en/submit',
-  },
-  callbacks: {
-    session({ session, token }) {
-      if (session.user && token.sub) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (session.user as any).id = token.sub;
-      }
-      return session;
-    },
-  },
-});
+// Auth is handled by Clerk (@clerk/nextjs).
+//
+// Setup: https://dashboard.clerk.com
+// Enable Google + Facebook in: Clerk Dashboard > User & Authentication > Social Connections
+//
+// Server Components:
+//   import { auth, currentUser } from '@clerk/nextjs/server';
+//   const { userId } = await auth();
+//   const user = await currentUser();
+//
+// Client Components:
+//   import { useUser, SignInButton, UserButton, SignedIn, SignedOut } from '@clerk/nextjs';
