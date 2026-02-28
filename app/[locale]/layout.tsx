@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import { routing } from '@/lib/i18n/routing';
 import { isRtl, type Locale } from '@/lib/i18n/config';
 import { Header } from '@/components/layout/header';
@@ -81,6 +82,7 @@ export default async function LocaleLayout({
             <Footer />
           </div>
         </NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   );
