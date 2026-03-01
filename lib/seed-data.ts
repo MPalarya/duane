@@ -279,6 +279,93 @@ export const seedCommunityLinks = [
   },
 ];
 
+export const seedHackOfWeek = {
+  id: 'seed-hack-1',
+  title: 'The "Shoulder Tap" Trick for Group Photos',
+  content:
+    'When someone asks for a group photo, lightly tap the shoulder of the person next to you and ask them to stand on your preferred side. Most people happily switch — and you get a photo where you can look straight at the camera without turning your head.',
+  author: 'Jamie R.',
+  upvotes: 42,
+  comments: [
+    { id: 'c1', author: 'Noa M.', text: 'Game changer! I do this at every family event now.' },
+    { id: 'c2', author: 'Alex T.', text: 'Such a simple tip but it makes a huge difference.' },
+    { id: 'c3', author: 'Priya S.', text: 'I taught my kids to do this too — works great at school.' },
+  ],
+};
+
+export const seedVisitorMapData: { code: string; count: number }[] = [
+  { code: 'US', count: 312 },
+  { code: 'IL', count: 187 },
+  { code: 'GB', count: 145 },
+  { code: 'DE', count: 98 },
+  { code: 'FR', count: 87 },
+  { code: 'IN', count: 76 },
+  { code: 'CA', count: 68 },
+  { code: 'AU', count: 54 },
+  { code: 'BR', count: 47 },
+  { code: 'ES', count: 43 },
+  { code: 'IT', count: 39 },
+  { code: 'NL', count: 35 },
+  { code: 'JP', count: 31 },
+  { code: 'KR', count: 28 },
+  { code: 'MX', count: 24 },
+  { code: 'SE', count: 22 },
+  { code: 'ZA', count: 19 },
+  { code: 'AR', count: 17 },
+  { code: 'PL', count: 15 },
+  { code: 'TR', count: 14 },
+  { code: 'SG', count: 12 },
+  { code: 'NZ', count: 10 },
+  { code: 'CH', count: 9 },
+  { code: 'NO', count: 8 },
+  { code: 'IE', count: 7 },
+];
+
+export const seedFeaturedAdvocates = [
+  {
+    _id: 'grace-mckagan',
+    name: 'Grace McKagan',
+    tags: ['Musician'],
+    bio: 'Grace has spoken publicly about living with Duane Syndrome, helping raise awareness through her platform and inspiring others in the DS community.',
+    videoUrl: 'https://www.tiktok.com/embed/v2/7565165321137474830',
+    socialLinks: [
+      { platform: 'instagram', url: 'https://www.instagram.com/gracemckagan/' },
+      { platform: 'tiktok', url: 'https://www.tiktok.com/@gracemckagan97' },
+    ],
+  },
+  {
+    _id: 'michelle-yates',
+    name: 'Michelle Yates',
+    tags: ['Nutritionist', 'Podcaster'],
+    bio: 'Nutrition expert and content creator who shares her experience with Duane Syndrome, bringing visibility to the condition through her wellness-focused content.',
+    videoUrl: 'https://www.instagram.com/reel/Cl9MaHBORm0/embed/',
+    socialLinks: [
+      { platform: 'instagram', url: 'https://www.instagram.com/yatesnutrition/' },
+    ],
+  },
+  {
+    _id: 'emily-didonato',
+    name: 'Emily DiDonato',
+    tags: ['Model'],
+    bio: 'International model and content creator who has openly shared her experience with Duane Syndrome, helping normalize the condition in the public eye.',
+    videoUrl: 'https://www.tiktok.com/embed/v2/7462404378872417582',
+    socialLinks: [
+      { platform: 'instagram', url: 'https://www.instagram.com/emilydidonato/' },
+      { platform: 'tiktok', url: 'https://www.tiktok.com/@didonatoemily' },
+    ],
+  },
+  {
+    _id: 'poonam-nathu',
+    name: 'Dr. Poonam Nathu',
+    tags: ['Doctor'],
+    bio: 'Neuro-vision specialist who educates about Duane Syndrome and other vision conditions through her practice and social media presence.',
+    videoUrl: 'https://www.instagram.com/reel/CwqHZc7p-29/embed/',
+    socialLinks: [
+      { platform: 'instagram', url: 'https://www.instagram.com/theneurovisiondoc/' },
+    ],
+  },
+];
+
 export const seedSpotlightPeople = [
   {
     _id: 'seed-spotlight-1',

@@ -1,71 +1,88 @@
 @import "tailwindcss";
 
-@theme inline {
-  /* Color palette: soft pastel kawaii — lavender, mint, pink, warm mauve */
-  --color-primary-50: #faf5ff;
-  --color-primary-100: #f0e4f8;
-  --color-primary-200: #e2ccf0;
-  --color-primary-300: #d0b4e4;
-  --color-primary-400: #b890d4;
-  --color-primary-500: #9b6cbe;
-  --color-primary-600: #7f52a4;
-  --color-primary-700: #683f88;
-  --color-primary-800: #533270;
-  --color-primary-900: #40265a;
+@theme {
+  /* Primary: Deep Navy #1A2238 */
+  --color-primary-50: #e8eaf0;
+  --color-primary-100: #c5c9d9;
+  --color-primary-200: #9ea5c0;
+  --color-primary-300: #7780a6;
+  --color-primary-400: #596593;
+  --color-primary-500: #3b4a80;
+  --color-primary-600: #344378;
+  --color-primary-700: #2b3a6d;
+  --color-primary-800: #223163;
+  --color-primary-900: #1A2238;
 
-  --color-accent-50: #f0faf4;
-  --color-accent-100: #dcf4e4;
-  --color-accent-200: #b8e8ca;
-  --color-accent-300: #90d8ac;
-  --color-accent-400: #68c48c;
-  --color-accent-500: #48ac70;
-  --color-accent-600: #368c58;
-  --color-accent-700: #2c7248;
-  --color-accent-800: #245c3a;
-  --color-accent-900: #1c4a30;
+  /* Accent: Soft Mint #D1E8E2 */
+  --color-accent-50: #f5fbf9;
+  --color-accent-100: #e8f5f1;
+  --color-accent-200: #D1E8E2;
+  --color-accent-300: #b3d9cf;
+  --color-accent-400: #8fc7b8;
+  --color-accent-500: #6bb5a1;
+  --color-accent-600: #52a08c;
+  --color-accent-700: #408174;
+  --color-accent-800: #34675d;
+  --color-accent-900: #2a534c;
 
-  --color-coral-50: #fef4f6;
-  --color-coral-100: #fce8ee;
-  --color-coral-200: #f8d0dc;
-  --color-coral-300: #f2b0c4;
-  --color-coral-400: #e88ca8;
-  --color-coral-500: #dc688c;
+  /* Coral → Goldenrod #FFCB05 */
+  --color-coral-50: #fffbe6;
+  --color-coral-100: #fff4b3;
+  --color-coral-200: #ffed80;
+  --color-coral-300: #ffe54d;
+  --color-coral-400: #ffdf26;
+  --color-coral-500: #FFCB05;
+  --color-coral-600: #e6b700;
+  --color-coral-700: #bf9800;
+  --color-coral-800: #997a00;
+  --color-coral-900: #735c00;
 
-  --color-warm-50: #faf8f9;
-  --color-warm-100: #f5f0f2;
-  --color-warm-200: #eae2e5;
-  --color-warm-300: #dbd0d4;
-  --color-warm-400: #b8a8ae;
-  --color-warm-500: #908084;
-  --color-warm-600: #6a5c60;
-  --color-warm-700: #524648;
-  --color-warm-800: #383032;
-  --color-warm-900: #261e20;
+  /* Warm: Cloud Dancer #F9F7F2 */
+  --color-warm-50: #fdfcfa;
+  --color-warm-100: #F9F7F2;
+  --color-warm-200: #f0ede5;
+  --color-warm-300: #e3dfd4;
+  --color-warm-400: #c9c4b5;
+  --color-warm-500: #a8a293;
+  --color-warm-600: #7a7568;
+  --color-warm-700: #5c574c;
+  --color-warm-800: #3d3a33;
+  --color-warm-900: #1f1d1a;
 
-  --color-background: #faf8f9;
-  --color-foreground: #261e20;
-  --color-muted: #908084;
-  --color-border: #eae2e5;
+  --color-background: #F9F7F2;
+  --color-foreground: #1A2238;
+  --color-muted: #7a7568;
+  --color-border: #e3dfd4;
   --color-card: #ffffff;
-  --color-card-foreground: #261e20;
+  --color-card-foreground: #1A2238;
 
   --font-sans: var(--font-inter);
 }
 
-/* Smooth scrolling */
 html {
-  scroll-behavior: smooth;
+  scroll-padding-top: 4rem;
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
-/* Focus visible styles for accessibility */
+/* Focus visible styles for accessibility — goldenrod outline */
 *:focus-visible {
-  outline: 2px solid var(--color-primary-500);
+  outline: 3px solid var(--color-coral-500);
   outline-offset: 2px;
+}
+
+/* Scrollbar-hide utility for carousel */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* RTL-specific utilities */

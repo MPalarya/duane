@@ -5,6 +5,7 @@ import { blogPostBySlugQuery } from '@/lib/sanity/queries';
 import { PortableTextContent } from '@/components/content/portable-text';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/lib/i18n/navigation';
+import { urlFor } from '@/lib/sanity/image';
 import type { Metadata } from 'next';
 
 interface BlogPost {
@@ -16,7 +17,7 @@ interface BlogPost {
   publishedAt?: string;
   readingTime?: number;
   tags?: string[];
-  author?: { name: string; bio?: string };
+  author?: { name: string; bio?: string; image?: { asset: { _ref: string } } };
   seoTitle?: string;
   seoDescription?: string;
 }
@@ -94,6 +95,28 @@ export default async function BlogPostPage({
       <div className="prose-custom">
         {post.body && <PortableTextContent value={post.body} />}
       </div>
+
+      {/* Author Card */}
+      {post.author && (
+        <div className="mt-12 rounded-xl border border-warm-200 bg-warm-50 p-6">
+          <div className="flex items-center gap-4">
+            {post.author.image && (
+              <img
+                src={urlFor(post.author.image).width(80).height(80).url()}
+                alt={post.author.name}
+                className="h-16 w-16 rounded-full object-cover"
+              />
+            )}
+            <div>
+              <p className="text-sm font-medium text-warm-400">Written by</p>
+              <p className="text-lg font-semibold text-warm-900">{post.author.name}</p>
+            </div>
+          </div>
+          {post.author.bio && (
+            <p className="mt-3 text-sm text-warm-600">{post.author.bio}</p>
+          )}
+        </div>
+      )}
 
       {/* Structured Data */}
       <script

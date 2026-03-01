@@ -73,6 +73,18 @@ export const spotlightPeopleQuery = groq`
   }
 `;
 
+// Featured advocates
+export const featuredAdvocatesQuery = groq`
+  *[_type == "featuredAdvocate" && locale == $locale] | order(sortOrder asc, _createdAt desc) {
+    _id,
+    name,
+    tags,
+    bio,
+    videoUrl,
+    socialLinks
+  }
+`;
+
 // Resources
 export const resourcesQuery = groq`
   *[_type == "resource" && locale == $locale] | order(_createdAt desc) {

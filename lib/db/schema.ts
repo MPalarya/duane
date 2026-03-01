@@ -122,3 +122,9 @@ export const submissions = sqliteTable('submissions', {
   status: text('status').default('pending'), // pending | approved | rejected
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
 });
+
+// Visitor login counts by country (for globe visualization)
+export const loginsByCountry = sqliteTable('logins_by_country', {
+  countryCode: text('country_code').primaryKey(), // ISO alpha-2
+  count: integer('count').notNull().default(0),
+});

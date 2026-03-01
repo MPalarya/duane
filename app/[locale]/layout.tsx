@@ -6,8 +6,11 @@ import { Inter } from 'next/font/google';
 import { routing } from '@/lib/i18n/routing';
 import { isRtl, type Locale } from '@/lib/i18n/config';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { BottomNav } from '@/components/layout/bottom-nav';
+import { LoginTracker } from '@/components/layout/login-tracker';
 
 const inter = Inter({
   subsets: ['latin', 'latin-ext'],
@@ -78,11 +81,16 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <div className="flex min-h-screen flex-col">
             <Header />
-            <main className="flex-1">{children}</main>
+            <main id="main-content" className="flex-1 pb-16 lg:pb-0">
+              {children}
+            </main>
             <Footer />
           </div>
+          <BottomNav />
+          <LoginTracker />
         </NextIntlClientProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
