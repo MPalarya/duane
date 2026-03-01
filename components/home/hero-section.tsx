@@ -2,8 +2,8 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
-import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { CobeGlobe, type GlobeMarker } from './cobe-globe';
 
 // ISO alpha-2 → [lat, lng]
@@ -23,8 +23,52 @@ const COUNTRY_COORDS: Record<string, [number, number]> = {
   ID: [-6.2, 106.8], VN: [21.0, 105.8],
 };
 
+const COUNTRY_NAMES: Record<string, string> = {
+  US: 'United States', IL: 'Israel', GB: 'United Kingdom', DE: 'Germany',
+  FR: 'France', IN: 'India', CA: 'Canada', AU: 'Australia', BR: 'Brazil',
+  ES: 'Spain', IT: 'Italy', NL: 'Netherlands', JP: 'Japan', KR: 'South Korea',
+  MX: 'Mexico', SE: 'Sweden', ZA: 'South Africa', AR: 'Argentina',
+  PL: 'Poland', TR: 'Turkey', SG: 'Singapore', NZ: 'New Zealand',
+  CH: 'Switzerland', NO: 'Norway', IE: 'Ireland', RU: 'Russia',
+  CN: 'China', NG: 'Nigeria', EG: 'Egypt', TH: 'Thailand',
+  PH: 'Philippines', CO: 'Colombia', CL: 'Chile', KE: 'Kenya',
+  PK: 'Pakistan', UA: 'Ukraine', CZ: 'Czechia', PT: 'Portugal',
+  AT: 'Austria', FI: 'Finland', DK: 'Denmark', BE: 'Belgium',
+  RO: 'Romania', GR: 'Greece', HU: 'Hungary', SA: 'Saudi Arabia',
+  AE: 'UAE', MY: 'Malaysia', ID: 'Indonesia', VN: 'Vietnam',
+};
+
+function countryFlag(code: string): string {
+  return [...code.toUpperCase()]
+    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
+    .join('');
+}
+
+const THETA = 0.25;
+const CENTER_THRESHOLD = 0.11;
+
+function markerCenterProximity(lat: number, lng: number, phi: number) {
+  const latR = (lat * Math.PI) / 180;
+  const lngR = (lng * Math.PI) / 180;
+  const wx = Math.cos(latR) * Math.cos(lngR);
+  const wy = Math.sin(latR);
+  const wz = -Math.cos(latR) * Math.sin(lngR);
+  const cp = Math.cos(phi), sp = Math.sin(phi);
+  const ct = Math.cos(THETA), st = Math.sin(THETA);
+  const camX = cp * wx + sp * wz;
+  const camZ = -sp * ct * wx + st * wy + cp * ct * wz;
+  return { camX, camZ };
+}
+
 interface VisitorData {
   code: string;
+  count: number;
+}
+
+interface ActivePopup {
+  code: string;
+  flag: string;
+  name: string;
   count: number;
 }
 
@@ -32,6 +76,35 @@ export function HeroSection() {
   const t = useTranslations('home.hero');
   const [markers, setMarkers] = useState<GlobeMarker[]>([]);
   const [totalLogins, setTotalLogins] = useState(0);
+  const [visitorData, setVisitorData] = useState<VisitorData[]>([]);
+  const [popups, setPopups] = useState<ActivePopup[]>([]);
+  const lastCheck = useRef(0);
+
+  const handlePhi = useCallback(
+    (phi: number) => {
+      const now = Date.now();
+      if (now - lastCheck.current < 350) return;
+      lastCheck.current = now;
+      if (visitorData.length === 0) return;
+
+      const nearCenter: ActivePopup[] = [];
+      for (const entry of visitorData) {
+        const coords = COUNTRY_COORDS[entry.code];
+        if (!coords) continue;
+        const { camX, camZ } = markerCenterProximity(coords[0], coords[1], phi);
+        if (Math.abs(camX) < CENTER_THRESHOLD && camZ > 0.3) {
+          nearCenter.push({
+            code: entry.code,
+            flag: countryFlag(entry.code),
+            name: COUNTRY_NAMES[entry.code] ?? entry.code,
+            count: entry.count,
+          });
+        }
+      }
+      setPopups(nearCenter);
+    },
+    [visitorData],
+  );
 
   useEffect(() => {
     fetch('/api/visitor-map')
@@ -54,13 +127,13 @@ export function HeroSection() {
         }
         setMarkers(mapped);
         setTotalLogins(total);
+        setVisitorData(data);
       })
       .catch(() => {});
   }, []);
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-primary-800 to-primary-900 px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-32">
-      {/* Decorative mint accent blob */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-24 end-[-6rem] h-72 w-72 rounded-full bg-accent-300/20 blur-3xl"
@@ -121,18 +194,63 @@ export function HeroSection() {
           </motion.div>
         </div>
 
-        {/* Globe — mobile: ~90vw, desktop: sized to match text column height */}
+        {/* Globe + popups — fixed height area so nothing shifts */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.5 }}
           className="flex flex-col items-center"
         >
-          <div className="w-full max-w-[85vw] sm:max-w-sm lg:max-w-md">
-            <CobeGlobe markers={markers} showLabels />
+          <div className="relative w-full max-w-[85vw] sm:max-w-sm lg:max-w-md">
+            <CobeGlobe markers={markers} onFramePhi={handlePhi} />
           </div>
+
+          {/* Mobile: single popup at bottom of globe */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-[8%] z-10 flex justify-center lg:hidden">
+            <AnimatePresence mode="wait">
+              {popups[0] && (
+                <motion.div
+                  key={popups[0].code}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.4 }}
+                  className="flex items-center gap-2 whitespace-nowrap rounded-full bg-black/50 px-3.5 py-1 text-sm backdrop-blur-sm"
+                >
+                  <span className="leading-none">{popups[0].flag}</span>
+                  <span className="font-medium text-white">{popups[0].name}</span>
+                  <span className="text-accent-200/70">{popups[0].count.toLocaleString()} visits</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Desktop: stacked popups to the right of globe */}
+          <div className="pointer-events-none absolute end-0 top-1/2 z-10 hidden -translate-y-1/2 translate-x-[60%] flex-col gap-1.5 lg:flex">
+            <AnimatePresence mode="popLayout">
+              {popups.map((p) => (
+                <motion.div
+                  key={p.code}
+                  layout
+                  initial={{ opacity: 0, x: -12, scale: 0.95 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -12, scale: 0.95 }}
+                  transition={{
+                    duration: 0.35,
+                    layout: { type: 'spring', stiffness: 300, damping: 25 },
+                  }}
+                  className="flex items-center gap-2 whitespace-nowrap rounded-full bg-white/10 px-3.5 py-1 text-sm backdrop-blur-sm"
+                >
+                  <span className="leading-none">{p.flag}</span>
+                  <span className="font-medium text-white">{p.name}</span>
+                  <span className="text-accent-200/70">{p.count.toLocaleString()} visits</span>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+
           {totalLogins > 0 && (
-            <p className="mt-3 text-center text-sm font-medium text-accent-200/80">
+            <p className="mt-2 text-center text-sm font-medium text-accent-200/80">
               {t('globalCommunity')} — {t('loginCount', { count: totalLogins })}
             </p>
           )}
