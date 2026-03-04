@@ -111,6 +111,15 @@ export const researchCache = sqliteTable('research_cache', {
   aiSummaryAdult: text('ai_summary_adult'),
   aiSummaryProfessional: text('ai_summary_professional'),
   fetchedAt: text('fetched_at').default('CURRENT_TIMESTAMP'),
+  // Multi-source & open access fields
+  doi: text('doi'),
+  pmcId: text('pmc_id'),
+  s2Id: text('s2_id'),
+  isOpenAccess: integer('is_open_access', { mode: 'boolean' }).default(false),
+  oaPdfUrl: text('oa_pdf_url'),
+  conclusions: text('conclusions'),
+  fullTextSource: text('full_text_source'),
+  source: text('source').default('pubmed'),
 });
 
 // Generic submissions

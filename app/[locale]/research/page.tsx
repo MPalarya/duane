@@ -20,6 +20,10 @@ interface ResearchPaper {
   aiSummarySimple: string | null;
   aiSummaryAdult: string | null;
   aiSummaryProfessional: string | null;
+  isOpenAccess: boolean | null;
+  oaPdfUrl: string | null;
+  conclusions: string | null;
+  source: string | null;
 }
 
 export default async function ResearchPage({
@@ -62,8 +66,8 @@ function ResearchContent({ papers }: { papers: ResearchPaper[] }) {
 
       <h1 className="text-3xl font-bold text-warm-900">{t('research')}</h1>
       <p className="mt-4 text-warm-600">
-        Latest research papers about Duane Syndrome from PubMed, with AI-generated summaries
-        at different reading levels.
+        Latest research papers about Duane Syndrome from PubMed, Europe PMC, and Semantic Scholar,
+        with AI-generated summaries at different reading levels.
       </p>
 
       {papers.length === 0 ? (

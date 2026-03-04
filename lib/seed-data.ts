@@ -204,6 +204,10 @@ export const seedResearchPapers = [
     aiSummarySimple: 'Doctors looked at 45 people who had eye surgery for Duane Syndrome Type 1. After many years, most people (82%) still had their eyes looking straight ahead, and 91% didn\'t need to turn their head as much. The surgery helped a lot, but a few people needed a second surgery later.',
     aiSummaryAdult: 'This 15-year study followed 45 patients who had a specific surgery (bilateral lateral rectus recession) for Duane Syndrome Type 1. The good news: 82% maintained good eye alignment long-term, and head turn improved in 91% of patients. Globe retraction was reduced but not fully eliminated. Only 3 patients needed additional surgery. This suggests the surgery has durable results.',
     aiSummaryProfessional: 'Retrospective cohort study (n=45) evaluating long-term outcomes of bilateral LR recession for DRS type 1. Mean follow-up 8.3 years. Primary outcome: 82% maintained alignment within 10 PD in primary position. Secondary outcomes: head turn improved in 91%, globe retraction reduced (mean 2.1mm decrease). Reoperation rate 6.7% (3/45). Findings support bilateral LR recession as a durable intervention with low reoperation rates.',
+    isOpenAccess: true,
+    oaPdfUrl: null,
+    conclusions: 'Bilateral lateral rectus recession remains an effective and durable surgical approach for Duane syndrome type 1. Long-term alignment was maintained in the majority of patients, with significant improvement in compensatory head posture. While globe retraction was reduced, it was not fully eliminated, and patients should be counseled accordingly. The low reoperation rate supports the reliability of this technique.',
+    source: 'europepmc',
   },
   {
     id: 'seed-research-2',
@@ -216,6 +220,10 @@ export const seedResearchPapers = [
     aiSummarySimple: 'Scientists found new genetic changes (mutations) that can cause Duane Syndrome to run in families. They found these changes in a gene called CHN1 in three different families. Interestingly, even people in the same family with the same gene change can have different levels of Duane Syndrome, from very mild to more noticeable.',
     aiSummaryAdult: 'Researchers discovered four new genetic mutations in the CHN1 gene that cause familial (inherited) Duane Syndrome. What\'s interesting is that even within the same family carrying the same mutation, the severity of Duane Syndrome varied widely — some family members had mild cases while others were more significantly affected. This suggests other genes or environmental factors play a role in how severe the condition becomes.',
     aiSummaryProfessional: 'Four novel CHN1 variants identified in 3 unrelated autosomal dominant DRS pedigrees. All variants demonstrated gain-of-function activity of alpha2-chimaerin in functional assays, consistent with the established pathomechanism of aberrant guidance signaling. Notable intrafamilial phenotypic variability observed, ranging from subclinical to bilateral DRS with upshoot. Findings expand the CHN1 mutation spectrum and underscore the role of genetic/environmental modifiers.',
+    isOpenAccess: false,
+    oaPdfUrl: null,
+    conclusions: null,
+    source: 'pubmed',
   },
 ];
 

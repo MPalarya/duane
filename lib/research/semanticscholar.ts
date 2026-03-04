@@ -1,0 +1,51 @@
+import type { ResearchArticle } from './types';
+
+const S2_BASE = 'https://api.semanticscholar.org/graph/v1';
+const SEARCH_TERM = 'Duane syndrome OR Duane retraction syndrome';
+
+export async function searchSemanticScholar(maxResults = 10): Promise<ResearchArticle[]> {
+  const params = new URLSearchParams({
+    query: SEARCH_TERM,
+    limit: String(maxResults),
+    fields: 'title,abstract,authors,journal,year,externalIds,isOpenAccess,openAccessPdf',
+  });
+
+  const res = await fetch(`${S2_BASE}/paper/search?${params}`);
+  if (!res.ok) {
+    console.error(`Semantic Scholar search error: ${res.status}`);
+    return [];
+  }
+
+  const data = await res.json();
+  const papers = data.data ?? [];
+
+  return papers
+    .filter((p: Record<string, unknown>) => p.title)
+    .map((p: Record<string, unknown>) => {
+      const externalIds = (p.externalIds ?? {}) as Record<string, string>;
+      const oaPdf = p.openAccessPdf as { url?: string } | null;
+
+      return {
+        pubmedId: externalIds.PubMed ?? '',
+        doi: externalIds.DOI ?? null,
+        pmcId: externalIds.PubMedCentral ? `PMC${externalIds.PubMedCentral}` : null,
+        s2Id: String(p.paperId ?? ''),
+        title: String(p.title),
+        abstract: String(p.abstract ?? ''),
+        authors: formatS2Authors(p.authors),
+        journal: (p.journal as { name?: string })?.name ?? '',
+        publishedDate: `${p.year ?? ''}-01-01`,
+        isOpenAccess: Boolean(p.isOpenAccess),
+        openAccessPdfUrl: oaPdf?.url ?? null,
+        source: 'semanticscholar' as const,
+      };
+    });
+}
+
+function formatS2Authors(authors: unknown): string {
+  if (!Array.isArray(authors)) return '';
+  return authors
+    .map((a: { name?: string }) => a.name ?? '')
+    .filter(Boolean)
+    .join(', ');
+}

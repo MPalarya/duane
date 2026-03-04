@@ -6,18 +6,29 @@ interface AiSummaries {
   professional: string;
 }
 
-export async function summarizeAbstract(
+export async function summarizeResearch(
   title: string,
-  abstract: string
+  abstract: string,
+  conclusions?: string | null
 ): Promise<AiSummaries | null> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || !abstract) return null;
 
+  const sourceDescription = conclusions
+    ? `Title: ${title}
+Abstract: ${abstract}
+Conclusions/Discussion (from full text): ${conclusions}`
+    : `Title: ${title}
+Abstract: ${abstract}`;
+
+  const conclusionsNote = conclusions
+    ? '\nIMPORTANT: Full-text conclusions are available. Use both the abstract AND conclusions to create more accurate, comprehensive summaries. Emphasize the actual findings and clinical takeaways from the conclusions section.'
+    : '';
+
   const prompt = `You are summarizing a medical research paper about Duane Syndrome for a patient information website.
 
-Title: ${title}
-Abstract: ${abstract}
-
+${sourceDescription}
+${conclusionsNote}
 Please provide THREE summaries of this research paper:
 
 1. SIMPLE (for children/teens, ages 10-16): Use simple language, short sentences. Explain what the researchers found in a way a young person with Duane Syndrome could understand. 2-3 sentences max.
@@ -65,3 +76,6 @@ Format your response as JSON:
     return null;
   }
 }
+
+/** @deprecated Use summarizeResearch instead */
+export const summarizeAbstract = summarizeResearch;
