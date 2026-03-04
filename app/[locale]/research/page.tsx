@@ -7,6 +7,8 @@ import { desc } from 'drizzle-orm';
 import { ResearchCard } from '@/components/content/research-card';
 import { seedResearchPapers } from '@/lib/seed-data';
 
+export const dynamic = 'force-dynamic';
+
 interface ResearchPaper {
   id: string;
   pubmedId: string | null;

@@ -39,17 +39,29 @@ Format your response as JSON:
       }),
     });
 
+    if (!res.ok) {
+      console.error(`Gemini API error: ${res.status} ${res.statusText}`);
+      return null;
+    }
+
     const data = await res.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (!text) return null;
+    if (!text) {
+      console.error('Gemini returned no text:', JSON.stringify(data).slice(0, 200));
+      return null;
+    }
 
     // Extract JSON from response (may be wrapped in markdown code block)
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
+    if (!jsonMatch) {
+      console.error('Could not extract JSON from Gemini response:', text.slice(0, 200));
+      return null;
+    }
 
     return JSON.parse(jsonMatch[0]);
-  } catch {
+  } catch (error) {
+    console.error('Summarization failed:', error);
     return null;
   }
 }

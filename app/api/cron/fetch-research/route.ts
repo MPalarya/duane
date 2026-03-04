@@ -3,7 +3,7 @@ import { db, isDbConfigured } from '@/lib/db/client';
 import { researchCache } from '@/lib/db/schema';
 import { searchPubMed, fetchArticleDetails } from '@/lib/research/pubmed';
 import { summarizeAbstract } from '@/lib/research/summarize';
-import { eq } from 'drizzle-orm';
+import { eq, isNull, and } from 'drizzle-orm';
 
 export async function POST(req: NextRequest) {
   // Verify cron secret
@@ -54,8 +54,31 @@ export async function POST(req: NextRequest) {
       newCount++;
     }
 
+    // Retry summarization for articles missing summaries
+    let summarized = 0;
+    const unsummarized = await db
+      .select()
+      .from(researchCache)
+      .where(and(isNull(researchCache.aiSummarySimple), researchCache.abstract !== null));
+
+    for (const article of unsummarized) {
+      if (!article.abstract) continue;
+      const summaries = await summarizeAbstract(article.title, article.abstract);
+      if (!summaries) continue;
+
+      await db
+        .update(researchCache)
+        .set({
+          aiSummarySimple: summaries.simple,
+          aiSummaryAdult: summaries.adult,
+          aiSummaryProfessional: summaries.professional,
+        })
+        .where(eq(researchCache.id, article.id));
+      summarized++;
+    }
+
     return NextResponse.json({
-      message: `Fetched ${articles.length} articles, ${newCount} new`,
+      message: `Fetched ${articles.length} articles, ${newCount} new, ${summarized} summarized`,
     });
   } catch (error) {
     console.error('Research fetch error:', error);
