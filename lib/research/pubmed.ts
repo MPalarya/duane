@@ -57,6 +57,7 @@ export async function fetchArticleDetails(ids: string[]): Promise<ResearchArticl
       isOpenAccess: false, // PubMed doesn't tell us directly
       openAccessPdfUrl: null,
       source: 'pubmed',
+      citationCount: 0,
     });
   }
 

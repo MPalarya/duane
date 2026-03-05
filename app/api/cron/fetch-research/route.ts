@@ -94,27 +94,28 @@ export async function POST(req: NextRequest) {
         aiSummarySimple: summaries?.simple ?? null,
         aiSummaryAdult: summaries?.adult ?? null,
         aiSummaryProfessional: summaries?.professional ?? null,
-        doi: article.doi,
-        pmcId: article.pmcId,
-        s2Id: article.s2Id,
+        doi: article.doi || null,
+        pmcId: article.pmcId || null,
+        s2Id: article.s2Id || null,
         isOpenAccess: article.isOpenAccess,
-        oaPdfUrl: article.openAccessPdfUrl,
+        oaPdfUrl: article.openAccessPdfUrl || null,
         conclusions,
         fullTextSource,
         source: article.source,
+        citationCount: article.citationCount ?? 0,
       });
 
       sourceCounts[article.source]++;
       newCount++;
     }
 
-    // 7. Retry: unsummarized articles (max 5)
+    // 7. Retry: unsummarized articles (max 20)
     let summarized = 0;
     const unsummarized = await db
       .select()
       .from(researchCache)
       .where(isNull(researchCache.aiSummarySimple))
-      .limit(5);
+      .limit(20);
 
     for (const article of unsummarized) {
       if (!article.abstract) continue;

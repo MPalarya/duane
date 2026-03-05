@@ -11,4 +11,5 @@ export interface ResearchArticle {
   isOpenAccess: boolean;
   openAccessPdfUrl: string | null;
   source: 'pubmed' | 'europepmc' | 'semanticscholar';
+  citationCount: number;
 }

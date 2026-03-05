@@ -34,6 +34,7 @@ export async function searchEuropePmc(maxResults = 10): Promise<ResearchArticle[
     isOpenAccess: r.isOpenAccess === 'Y',
     openAccessPdfUrl: null, // filled in later if OA
     source: 'europepmc' as const,
+    citationCount: Number(r.citedByCount ?? 0),
   }));
 }
 

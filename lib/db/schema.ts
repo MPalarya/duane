@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
 
 // Users (from social login)
 export const users = sqliteTable('users', {
@@ -110,7 +111,7 @@ export const researchCache = sqliteTable('research_cache', {
   aiSummarySimple: text('ai_summary_simple'),
   aiSummaryAdult: text('ai_summary_adult'),
   aiSummaryProfessional: text('ai_summary_professional'),
-  fetchedAt: text('fetched_at').default('CURRENT_TIMESTAMP'),
+  fetchedAt: text('fetched_at').default(sql`(CURRENT_TIMESTAMP)`),
   // Multi-source & open access fields
   doi: text('doi'),
   pmcId: text('pmc_id'),
@@ -120,6 +121,7 @@ export const researchCache = sqliteTable('research_cache', {
   conclusions: text('conclusions'),
   fullTextSource: text('full_text_source'),
   source: text('source').default('pubmed'),
+  citationCount: integer('citation_count').default(0),
 });
 
 // Generic submissions
@@ -130,6 +132,14 @@ export const submissions = sqliteTable('submissions', {
   dataJson: text('data_json').notNull(),
   status: text('status').default('pending'), // pending | approved | rejected
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+});
+
+// Research paper likes (anonymous, no auth required)
+export const researchLikes = sqliteTable('research_likes', {
+  id: text('id').primaryKey(),
+  paperId: text('paper_id').notNull(),
+  visitorId: text('visitor_id').notNull(),
+  createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
 });
 
 // Visitor login counts by country (for globe visualization)

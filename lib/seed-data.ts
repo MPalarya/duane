@@ -208,6 +208,8 @@ export const seedResearchPapers = [
     oaPdfUrl: null,
     conclusions: 'Bilateral lateral rectus recession remains an effective and durable surgical approach for Duane syndrome type 1. Long-term alignment was maintained in the majority of patients, with significant improvement in compensatory head posture. While globe retraction was reduced, it was not fully eliminated, and patients should be counseled accordingly. The low reoperation rate supports the reliability of this technique.',
     source: 'europepmc',
+    doi: '10.3928/01913913-20240801-01',
+    citationCount: 23,
   },
   {
     id: 'seed-research-2',
@@ -224,6 +226,8 @@ export const seedResearchPapers = [
     oaPdfUrl: null,
     conclusions: null,
     source: 'pubmed',
+    doi: '10.1093/hmg/ddae015',
+    citationCount: 7,
   },
 ];
 

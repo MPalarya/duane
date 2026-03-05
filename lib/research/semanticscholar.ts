@@ -7,7 +7,7 @@ export async function searchSemanticScholar(maxResults = 10): Promise<ResearchAr
   const params = new URLSearchParams({
     query: SEARCH_TERM,
     limit: String(maxResults),
-    fields: 'title,abstract,authors,journal,year,externalIds,isOpenAccess,openAccessPdf',
+    fields: 'title,abstract,authors,journal,year,externalIds,isOpenAccess,openAccessPdf,citationCount',
   });
 
   const res = await fetch(`${S2_BASE}/paper/search?${params}`);
@@ -36,8 +36,9 @@ export async function searchSemanticScholar(maxResults = 10): Promise<ResearchAr
         journal: (p.journal as { name?: string })?.name ?? '',
         publishedDate: `${p.year ?? ''}-01-01`,
         isOpenAccess: Boolean(p.isOpenAccess),
-        openAccessPdfUrl: oaPdf?.url ?? null,
+        openAccessPdfUrl: oaPdf?.url || null,
         source: 'semanticscholar' as const,
+        citationCount: Number(p.citationCount ?? 0),
       };
     });
 }
