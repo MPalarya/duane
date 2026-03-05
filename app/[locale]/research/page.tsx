@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { db, isDbConfigured } from '@/lib/db/client';
 import { researchCache, researchLikes } from '@/lib/db/schema';
-import { desc, sql } from 'drizzle-orm';
+import { desc, isNotNull, sql } from 'drizzle-orm';
 import { seedResearchPapers } from '@/lib/seed-data';
 import { ResearchPageClient, type ResearchPaper } from '@/components/content/research-page-client';
 
@@ -25,6 +25,7 @@ export default async function ResearchPage({
       papers = await db
         .select()
         .from(researchCache)
+        .where(isNotNull(researchCache.abstract))
         .orderBy(desc(researchCache.publishedDate))
         .limit(50);
 

@@ -142,7 +142,55 @@ export async function POST(req: NextRequest) {
       summarized++;
     }
 
-    // 8. Backfill OA status for old records missing it (max 5)
+    // 8. Backfill missing abstracts from PubMed / Europe PMC (max 10)
+    let abstractsBackfilled = 0;
+    const missingAbstract = await db
+      .select()
+      .from(researchCache)
+      .where(isNull(researchCache.abstract))
+      .limit(10);
+
+    for (const article of missingAbstract) {
+      let abstract: string | null = null;
+
+      // Try PubMed first (via pubmedId)
+      if (!abstract && article.pubmedId) {
+        try {
+          const details = await fetchArticleDetails([article.pubmedId]);
+          if (details[0]?.abstract) abstract = details[0].abstract;
+        } catch { /* skip */ }
+      }
+
+      // Try Europe PMC (via DOI or pubmedId)
+      if (!abstract) {
+        try {
+          const query = article.pubmedId
+            ? `EXT_ID:${article.pubmedId} AND SRC:MED`
+            : article.doi
+              ? `DOI:"${article.doi}"`
+              : null;
+          if (query) {
+            const params = new URLSearchParams({ query, resultType: 'core', format: 'json' });
+            const res = await fetch(`https://www.ebi.ac.uk/europepmc/webservices/rest/search?${params}`);
+            if (res.ok) {
+              const data = await res.json();
+              const result = data.resultList?.result?.[0];
+              if (result?.abstractText) abstract = String(result.abstractText);
+            }
+          }
+        } catch { /* skip */ }
+      }
+
+      if (abstract) {
+        await db
+          .update(researchCache)
+          .set({ abstract })
+          .where(eq(researchCache.id, article.id));
+        abstractsBackfilled++;
+      }
+    }
+
+    // 9. Backfill OA status for old records missing it (max 5)
     let backfilled = 0;
     const missingOa = await db
       .select()
@@ -185,7 +233,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({
-      message: `Fetched ${unique.length} unique articles, ${newCount} new, ${summarized} summarized, ${backfilled} backfilled`,
+      message: `Fetched ${unique.length} unique articles, ${newCount} new, ${summarized} summarized, ${abstractsBackfilled} abstracts backfilled, ${backfilled} OA backfilled`,
       sources: sourceCounts,
       fullTextConclusions: fullTextCount,
     });
