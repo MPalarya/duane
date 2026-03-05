@@ -3,6 +3,29 @@ import type { ResearchArticle } from './types';
 const S2_BASE = 'https://api.semanticscholar.org/graph/v1';
 const SEARCH_TERM = 'Duane syndrome OR Duane retraction syndrome';
 
+function getHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {
+    'User-Agent': 'DuaneSyndromePortal/1.0 (research aggregator)',
+  };
+  const apiKey = process.env.S2_API_KEY;
+  if (apiKey) {
+    headers['x-api-key'] = apiKey;
+  }
+  return headers;
+}
+
+async function fetchWithRetry(url: string, retries = 2): Promise<Response> {
+  const headers = getHeaders();
+  for (let i = 0; i < retries; i++) {
+    const res = await fetch(url, { headers });
+    if (res.status !== 429) return res;
+    const wait = 15000 * (i + 1); // 15s, 30s — gentle backoff
+    console.log(`Semantic Scholar 429, retrying in ${wait / 1000}s...`);
+    await new Promise((r) => setTimeout(r, wait));
+  }
+  return fetch(url, { headers }); // final attempt
+}
+
 export async function searchSemanticScholar(maxResults = 10): Promise<ResearchArticle[]> {
   const params = new URLSearchParams({
     query: SEARCH_TERM,
@@ -10,9 +33,10 @@ export async function searchSemanticScholar(maxResults = 10): Promise<ResearchAr
     fields: 'title,abstract,authors,journal,year,externalIds,isOpenAccess,openAccessPdf,citationCount',
   });
 
-  const res = await fetch(`${S2_BASE}/paper/search?${params}`);
+  const res = await fetchWithRetry(`${S2_BASE}/paper/search?${params}`);
   if (!res.ok) {
-    console.error(`Semantic Scholar search error: ${res.status}`);
+    const body = await res.text().catch(() => '');
+    console.error(`Semantic Scholar search error: ${res.status} — ${body.slice(0, 200)}`);
     return [];
   }
 

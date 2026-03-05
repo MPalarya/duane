@@ -9,6 +9,8 @@ import { summarizeResearch } from '@/lib/research/summarize';
 import type { ResearchArticle } from '@/lib/research/types';
 import { eq, isNull, or } from 'drizzle-orm';
 
+export const maxDuration = 300; // 5 minutes
+
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
@@ -79,7 +81,8 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // 5. Summarize with conclusions when available
+      // 5. Summarize with conclusions when available (with delay to avoid rate limits)
+      if (newCount > 0) await new Promise((r) => setTimeout(r, 4000));
       const summaries = await summarizeResearch(article.title, article.abstract, conclusions);
 
       // 6. Insert with all new fields
@@ -117,8 +120,10 @@ export async function POST(req: NextRequest) {
       .where(isNull(researchCache.aiSummarySimple))
       .limit(20);
 
-    for (const article of unsummarized) {
+    for (let i = 0; i < unsummarized.length; i++) {
+      const article = unsummarized[i];
       if (!article.abstract) continue;
+      if (i > 0) await new Promise((r) => setTimeout(r, 4000));
       const summaries = await summarizeResearch(
         article.title,
         article.abstract,

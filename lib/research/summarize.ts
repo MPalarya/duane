@@ -1,4 +1,4 @@
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
 interface AiSummaries {
   simple: string;
@@ -9,7 +9,8 @@ interface AiSummaries {
 export async function summarizeResearch(
   title: string,
   abstract: string,
-  conclusions?: string | null
+  conclusions?: string | null,
+  retries = 0
 ): Promise<AiSummaries | null> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || !abstract) return null;
@@ -51,7 +52,14 @@ Format your response as JSON:
     });
 
     if (!res.ok) {
-      console.error(`Gemini API error: ${res.status} ${res.statusText}`);
+      const errorBody = await res.text().catch(() => '');
+      if (res.status === 429 && retries < 3) {
+        const wait = 10000 * (retries + 1); // 10s, 20s, 30s
+        console.log(`Gemini API 429, retrying in ${wait / 1000}s...`);
+        await new Promise((r) => setTimeout(r, wait));
+        return summarizeResearch(title, abstract, conclusions, retries + 1);
+      }
+      console.error(`Gemini API error: ${res.status} ${res.statusText} — ${errorBody.slice(0, 300)}`);
       return null;
     }
 
