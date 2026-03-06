@@ -68,7 +68,8 @@ export function Header() {
               onMouseEnter={() => setToolsOpen(true)}
               onMouseLeave={() => setToolsOpen(false)}
             >
-              <button
+              <Link
+                href="/tools"
                 className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                   pathname.startsWith('/tools')
                     ? 'bg-primary-50 text-primary-800'
@@ -76,9 +77,9 @@ export function Header() {
                 }`}
               >
                 {t('tools')} <span className="text-xs">▾</span>
-              </button>
+              </Link>
               {toolsOpen && (
-                <div className="absolute right-0 top-full z-50 mt-1 w-56 rounded-lg border border-warm-300 bg-white py-1 shadow-lg">
+                <div className="absolute right-0 top-full z-50 w-56 rounded-lg border border-warm-300 bg-white py-1 shadow-lg">
                   {toolItems.map((item) => (
                     <Link
                       key={item.href}

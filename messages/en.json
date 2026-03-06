@@ -134,6 +134,15 @@
     "paperCount": "{filtered} / {total} papers",
     "citations": "{count} citations"
   },
+  "toolsPage": {
+    "description": "Interactive tools to help understand, explain, and manage Duane Syndrome in daily life.",
+    "gazeSimulatorDesc": "See how Duane Syndrome affects eye movement",
+    "screeningDesc": "Quick assessment for potential Duane Syndrome",
+    "onePagerDesc": "Generate a shareable card about your DS",
+    "explainTemplatesDesc": "Ready-made templates to explain DS to others",
+    "emergencyCardDesc": "Printable card for medical emergencies",
+    "exerciseTrackerDesc": "Track your eye exercises and progress"
+  },
   "common": {
     "learnMore": "Learn more",
     "readMore": "Read more",

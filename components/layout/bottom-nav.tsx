@@ -8,7 +8,7 @@ const tabs = [
   { href: '/' as const, icon: Home, labelKey: 'home' },
   { href: '/research' as const, icon: FlaskConical, labelKey: 'research' },
   { href: '/community' as const, icon: Users, labelKey: 'community' },
-  { href: '/tools/gaze-simulator' as const, icon: Wrench, labelKey: 'tools' },
+  { href: '/tools' as const, icon: Wrench, labelKey: 'tools' },
   { href: '/community/mentors' as const, icon: User, labelKey: 'profile' },
 ] as const;
 

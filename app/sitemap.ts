@@ -12,6 +12,7 @@ const staticPages = [
   '/community/blog',
   '/research',
   '/specialists',
+  '/tools',
   '/tools/gaze-simulator',
   '/tools/screening',
   '/tools/one-pager',
