@@ -41,15 +41,6 @@ export default async function SpecialistDetailPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-      {/* Breadcrumb */}
-      <nav className="mb-6 text-sm text-warm-400">
-        <Link href="/" className="hover:text-primary-600">Home</Link>
-        <span className="mx-2">/</span>
-        <Link href="/specialists" className="hover:text-primary-600">Specialists</Link>
-        <span className="mx-2">/</span>
-        <span className="text-warm-600">{specialist.name}</span>
-      </nav>
-
       <div className="flex items-start justify-between">
         <h1 className="text-3xl font-bold text-warm-900">{specialist.name}</h1>
         {specialist.verified && <Badge variant="success">Verified</Badge>}

@@ -54,17 +54,6 @@ export default async function BlogPostPage({
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-      {/* Breadcrumb */}
-      <nav className="mb-6 text-sm text-warm-400">
-        <Link href="/" className="hover:text-primary-600">Home</Link>
-        <span className="mx-2">/</span>
-        <Link href="/community" className="hover:text-primary-600">Community</Link>
-        <span className="mx-2">/</span>
-        <Link href="/community/blog" className="hover:text-primary-600">Blog</Link>
-        <span className="mx-2">/</span>
-        <span className="text-warm-600">{post.title}</span>
-      </nav>
-
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-warm-900 sm:text-4xl">
           {post.title}

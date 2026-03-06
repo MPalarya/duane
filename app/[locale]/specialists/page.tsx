@@ -47,13 +47,6 @@ function SpecialistsContent({ specialists: data }: { specialists: Specialist[] }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-      {/* Breadcrumb */}
-      <nav className="mb-6 text-sm text-warm-400">
-        <Link href="/" className="hover:text-primary-600">Home</Link>
-        <span className="mx-2">/</span>
-        <span className="text-warm-600">{t('specialists')}</span>
-      </nav>
-
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-warm-900">{t('specialists')}</h1>

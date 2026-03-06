@@ -74,14 +74,6 @@ function SpotlightContent({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-      <nav className="mb-6 text-sm text-warm-400">
-        <Link href="/" className="hover:text-primary-600">Home</Link>
-        <span className="mx-2">/</span>
-        <Link href="/community" className="hover:text-primary-600">{t('community')}</Link>
-        <span className="mx-2">/</span>
-        <span className="text-warm-600">{t('spotlight')}</span>
-      </nav>
-
       <h1 className="text-3xl font-bold text-warm-900">{t('spotlight')}</h1>
       <p className="mt-4 text-warm-600">
         Inspiring public figures who have Duane Syndrome. Their success shows that Duane Syndrome

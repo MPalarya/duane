@@ -12,14 +12,6 @@ export default async function ExerciseTrackerPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-      <nav className="mb-6 text-sm text-warm-400">
-        <Link href="/" className="hover:text-primary-600">Home</Link>
-        <span className="mx-2">/</span>
-        <Link href="/tools/gaze-simulator" className="hover:text-primary-600">Tools</Link>
-        <span className="mx-2">/</span>
-        <span className="text-warm-600">Exercise Tracker</span>
-      </nav>
-
       <h1 className="text-3xl font-bold text-warm-900">Eye Exercise Tracker</h1>
       <p className="mt-4 text-warm-600">
         If your ophthalmologist has recommended vision therapy exercises, use this tracker to

@@ -28,12 +28,6 @@ function ToolsContent() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-      <nav className="mb-6 text-sm text-warm-400">
-        <Link href="/" className="hover:text-primary-600">Home</Link>
-        <span className="mx-2">/</span>
-        <span className="text-warm-600">{t('tools')}</span>
-      </nav>
-
       <h1 className="text-3xl font-bold text-warm-900">{t('tools')}</h1>
       <p className="mt-4 text-warm-600">
         {td('description')}
