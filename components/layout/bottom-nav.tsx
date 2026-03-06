@@ -2,11 +2,11 @@
 
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/lib/i18n/navigation';
-import { Home, BookOpen, Users, Wrench, User } from 'lucide-react';
+import { Home, FlaskConical, Users, Wrench, User } from 'lucide-react';
 
 const tabs = [
   { href: '/' as const, icon: Home, labelKey: 'home' },
-  { href: '/blog' as const, icon: BookOpen, labelKey: 'blog' },
+  { href: '/research' as const, icon: FlaskConical, labelKey: 'research' },
   { href: '/community' as const, icon: Users, labelKey: 'community' },
   { href: '/tools/gaze-simulator' as const, icon: Wrench, labelKey: 'tools' },
   { href: '/community/mentors' as const, icon: User, labelKey: 'profile' },

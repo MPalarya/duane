@@ -9,7 +9,7 @@ const staticPages = [
   '/about/types',
   '/about/treatments',
   '/about/faq',
-  '/blog',
+  '/community/blog',
   '/research',
   '/specialists',
   '/tools/gaze-simulator',

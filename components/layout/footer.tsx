@@ -66,7 +66,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-sm text-warm-500 hover:text-primary-600">
+                <Link href="/community/blog" className="text-sm text-warm-500 hover:text-primary-600">
                   {nav('blog')}
                 </Link>
               </li>

@@ -39,6 +39,14 @@ function BlogContent({ posts }: { posts: BlogPost[] }) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+      <nav className="mb-6 text-sm text-warm-400">
+        <Link href="/" className="hover:text-primary-600">Home</Link>
+        <span className="mx-2">/</span>
+        <Link href="/community" className="hover:text-primary-600">{t('community')}</Link>
+        <span className="mx-2">/</span>
+        <span className="text-warm-600">{t('blog')}</span>
+      </nav>
+
       <h1 className="text-3xl font-bold text-warm-900">{t('blog')}</h1>
 
       {posts.length === 0 ? (
@@ -52,7 +60,7 @@ function BlogContent({ posts }: { posts: BlogPost[] }) {
           {posts.map((post) => (
             <Link
               key={post._id}
-              href={`/blog/${post.slug.current}`}
+              href={`/community/blog/${post.slug.current}`}
               className="group block rounded-xl border border-warm-200 bg-card p-6 transition-all hover:border-primary-300 hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-4">

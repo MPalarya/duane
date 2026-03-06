@@ -56,7 +56,7 @@ function CommunityContent({ links }: { links: CommunityLink[] }) {
       </p>
 
       {/* Sub-sections */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link
           href="/community/mentors"
           className="group rounded-xl border border-warm-200 bg-card p-6 text-center transition-all hover:border-primary-300 hover:shadow-md"
@@ -80,6 +80,14 @@ function CommunityContent({ links }: { links: CommunityLink[] }) {
           <span className="text-3xl">✨</span>
           <h2 className="mt-2 text-lg font-semibold text-primary-700">{t('spotlight')}</h2>
           <p className="mt-1 text-sm text-warm-500">Known people</p>
+        </Link>
+        <Link
+          href="/community/blog"
+          className="group rounded-xl border border-warm-200 bg-card p-6 text-center transition-all hover:border-primary-300 hover:shadow-md"
+        >
+          <span className="text-3xl">📝</span>
+          <h2 className="mt-2 text-lg font-semibold text-primary-700">{t('blog')}</h2>
+          <p className="mt-1 text-sm text-warm-500">Community articles</p>
         </Link>
       </div>
 
