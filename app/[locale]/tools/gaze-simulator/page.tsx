@@ -21,8 +21,9 @@ function GazeSimulatorContent() {
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-warm-900">{t('gazeSimulator')}</h1>
       <p className="mt-4 text-warm-600">
-        See how Duane Syndrome affects eye movement. Adjust the controls to explore different
-        types and severity levels. Use this tool to explain the condition to teachers, friends, or doctors.
+        See how Duane Syndrome affects eye movement from two perspectives: the <strong>Observer View</strong> shows
+        how the eyes appear to others, while the <strong>Patient View</strong> simulates the double vision (diplopia)
+        that patients may experience. Adjust the controls to explore different types and severity levels.
       </p>
 
       <div className="mt-8">

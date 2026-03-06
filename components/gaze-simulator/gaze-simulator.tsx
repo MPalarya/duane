@@ -1,73 +1,10 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { calculateEyePosition, type DuaneType, type AffectedEye, type EyePosition } from './shared';
+import { VisionView } from './vision-view';
 
-type DuaneType = 1 | 2 | 3;
-type AffectedEye = 'left' | 'right';
-
-interface EyePosition {
-  x: number; // -1 (left) to 1 (right)
-  retraction: number; // 0 to 1
-  upshoot: number; // 0 to 1
-  fissureNarrowing: number; // 0 to 1
-}
-
-function calculateEyePosition(
-  gazeDirection: number, // -1 left to 1 right
-  duaneType: DuaneType,
-  severity: number, // 0 to 1
-  isAffectedEye: boolean
-): EyePosition {
-  if (!isAffectedEye) {
-    // Normal eye follows gaze freely
-    return { x: gazeDirection, retraction: 0, upshoot: 0, fissureNarrowing: 0 };
-  }
-
-  let x = gazeDirection;
-  let retraction = 0;
-  let upshoot = 0;
-  let fissureNarrowing = 0;
-
-  switch (duaneType) {
-    case 1:
-      // Limited abduction (can't look outward well)
-      if (gazeDirection > 0) {
-        // For left affected eye, outward = right (positive)
-        x = gazeDirection * (1 - severity * 0.8);
-      }
-      // Retraction on adduction
-      if (gazeDirection < -0.2) {
-        retraction = Math.abs(gazeDirection + 0.2) * severity * 0.6;
-        fissureNarrowing = retraction * 0.8;
-        upshoot = retraction * 0.4;
-      }
-      break;
-
-    case 2:
-      // Limited adduction (can't look inward well)
-      if (gazeDirection < 0) {
-        x = gazeDirection * (1 - severity * 0.7);
-      }
-      // Retraction on adduction attempt
-      if (gazeDirection < -0.2) {
-        retraction = Math.abs(gazeDirection + 0.2) * severity * 0.5;
-        fissureNarrowing = retraction * 0.7;
-      }
-      break;
-
-    case 3:
-      // Limited both directions
-      x = gazeDirection * (1 - severity * 0.6);
-      if (Math.abs(gazeDirection) > 0.3) {
-        retraction = (Math.abs(gazeDirection) - 0.3) * severity * 0.5;
-        fissureNarrowing = retraction * 0.7;
-        upshoot = retraction * 0.3;
-      }
-      break;
-  }
-
-  return { x, retraction, upshoot, fissureNarrowing };
-}
+type ViewTab = 'observer' | 'patient';
 
 function Eye({
   position,
@@ -173,6 +110,7 @@ export function GazeSimulator() {
   const [duaneType, setDuaneType] = useState<DuaneType>(1);
   const [severity, setSeverity] = useState(0.7);
   const [affectedEye, setAffectedEye] = useState<AffectedEye>('left');
+  const [activeTab, setActiveTab] = useState<ViewTab>('observer');
 
   const leftEyeAffected = affectedEye === 'left';
 
@@ -201,20 +139,54 @@ export function GazeSimulator() {
 
   return (
     <div className="rounded-xl border border-warm-200 bg-card p-6">
-      {/* Eyes Display */}
-      <div className="flex items-center justify-center gap-8 py-6">
-        <Eye
-          position={leftPos}
-          label="Left Eye"
-          isAffected={leftEyeAffected}
-        />
-        <div className="text-2xl text-warm-300">👃</div>
-        <Eye
-          position={rightPos}
-          label="Right Eye"
-          isAffected={!leftEyeAffected}
-        />
+      {/* Tab Switcher */}
+      <div className="mb-4 flex rounded-lg bg-warm-100 p-1">
+        {(['observer', 'patient'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === tab
+                ? 'bg-white text-warm-900 shadow-sm'
+                : 'text-warm-500 hover:text-warm-700'
+            }`}
+          >
+            {tab === 'observer' ? 'Observer View' : 'Patient View'}
+          </button>
+        ))}
       </div>
+
+      {/* Observer View */}
+      {activeTab === 'observer' && (
+        <>
+          <div className="flex items-center justify-center gap-8 py-6">
+            <Eye
+              position={leftPos}
+              label="Left Eye"
+              isAffected={leftEyeAffected}
+            />
+            <div className="text-2xl text-warm-300">👃</div>
+            <Eye
+              position={rightPos}
+              label="Right Eye"
+              isAffected={!leftEyeAffected}
+            />
+          </div>
+          <p className="mb-2 text-center text-xs text-warm-400">
+            How the eyes look to someone observing the patient.
+          </p>
+        </>
+      )}
+
+      {/* Patient View */}
+      {activeTab === 'patient' && (
+        <VisionView
+          gazeDirection={gazeDirection}
+          duaneType={duaneType}
+          severity={severity}
+          affectedEye={affectedEye}
+        />
+      )}
 
       {/* Gaze Direction Label */}
       <div className="mb-2 text-center text-sm text-warm-500">

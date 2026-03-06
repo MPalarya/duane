@@ -136,7 +136,7 @@
   },
   "toolsPage": {
     "description": "Interactive tools to help understand, explain, and manage Duane Syndrome in daily life.",
-    "gazeSimulatorDesc": "See how Duane Syndrome affects eye movement",
+    "gazeSimulatorDesc": "See how DS affects eye movement — from both observer and patient perspectives",
     "screeningDesc": "Quick assessment for potential Duane Syndrome",
     "onePagerDesc": "Generate a shareable card about your DS",
     "explainTemplatesDesc": "Ready-made templates to explain DS to others",
