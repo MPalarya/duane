@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { db, isDbConfigured } from '@/lib/db/client';
 import { researchCache, researchLikes } from '@/lib/db/schema';
-import { desc, isNotNull, sql } from 'drizzle-orm';
+import { and, desc, gt, gte, isNotNull, like, or, sql } from 'drizzle-orm';
 import { seedResearchPapers } from '@/lib/seed-data';
 import { ResearchPageClient, type ResearchPaper } from '@/components/content/research-page-client';
 
@@ -22,12 +22,36 @@ export default async function ResearchPage({
 
   if (isDbConfigured) {
     try {
+      // Fetch qualifying articles scored by relevance:
+      // - must have abstract
+      // - must have "duane" in title OR abstract
+      // - must be published in last 2 years
+      // Sorted by: citations desc, then date desc
+      const twoYearsAgo = new Date();
+      twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+      const cutoff = twoYearsAgo.toISOString().slice(0, 10);
+
       papers = await db
         .select()
         .from(researchCache)
-        .where(isNotNull(researchCache.abstract))
-        .orderBy(desc(researchCache.publishedDate))
-        .limit(50);
+        .where(
+          and(
+            isNotNull(researchCache.abstract),
+            isNotNull(researchCache.aiSummarySimple),
+            or(
+              like(sql`lower(${researchCache.title})`, '%duane%'),
+              like(sql`lower(${researchCache.abstract})`, '%duane%'),
+            ),
+            or(
+              gte(researchCache.publishedDate, cutoff),
+              gt(sql`COALESCE(${researchCache.citationCount}, 0)`, 0),
+            ),
+          )
+        )
+        .orderBy(
+          desc(sql`COALESCE(${researchCache.citationCount}, 0)`),
+          desc(researchCache.publishedDate),
+        );
 
       const counts = await db
         .select({

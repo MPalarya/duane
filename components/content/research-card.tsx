@@ -146,7 +146,7 @@ export function ResearchCard({
   };
 
   return (
-    <div className="rounded-xl border border-warm-200 bg-card p-5">
+    <div className="overflow-hidden rounded-xl border border-warm-200 bg-card p-5">
       {/* Badges + link: separate row on mobile, inline with title on desktop */}
       {(paper.isOpenAccess != null || articleUrl) && (
         <div className="mb-2 flex items-center justify-end gap-2 sm:hidden">

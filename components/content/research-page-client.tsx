@@ -203,9 +203,9 @@ export function ResearchPageClient({ papers, likeCounts: initialLikeCounts }: Pr
   };
 
   return (
-    <div className="mt-8 flex gap-6">
-      {/* Desktop sidebar — narrower */}
-      <aside className="hidden w-48 shrink-0 lg:block">
+    <div className="mt-8 lg:flex lg:gap-10">
+      {/* Desktop sidebar */}
+      <aside className="hidden w-40 shrink-0 lg:block">
         <div className="sticky top-24">
           <ResearchFilters {...filterProps} />
         </div>
