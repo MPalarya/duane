@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { Link, usePathname } from '@/lib/i18n/navigation';
 import { LocaleSwitcher } from './locale-switcher';
 import { AuthButtons } from './auth-buttons';
@@ -41,9 +42,19 @@ export function Header() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <Link
             href="/"
-            className="text-xl font-bold text-primary-800 transition-colors hover:text-primary-900"
+            className="flex items-center gap-2 transition-colors hover:opacity-90"
           >
-            Duane Syndrome
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo.png"
+              alt="Duane Syndrome"
+              width={40}
+              height={40}
+              className="rounded-md"
+            />
+            <span className="text-xl font-bold text-primary-800">
+              Duane Syndrome
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
