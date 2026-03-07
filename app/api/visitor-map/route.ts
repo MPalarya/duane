@@ -4,10 +4,12 @@ import { loginsByCountry } from '@/lib/db/schema';
 import { seedVisitorMapData } from '@/lib/seed-data';
 import { desc } from 'drizzle-orm';
 
+const CACHE = 'public, s-maxage=60, stale-while-revalidate=300';
+
 export async function GET() {
   if (!isDbConfigured) {
     return NextResponse.json(seedVisitorMapData, {
-      headers: { 'Cache-Control': 'public, s-maxage=3600' },
+      headers: { 'Cache-Control': CACHE },
     });
   }
 
@@ -20,14 +22,12 @@ export async function GET() {
       .from(loginsByCountry)
       .orderBy(desc(loginsByCountry.count));
 
-    const data = rows.length > 0 ? rows : seedVisitorMapData;
-
-    return NextResponse.json(data, {
-      headers: { 'Cache-Control': 'public, s-maxage=3600' },
+    return NextResponse.json(rows, {
+      headers: { 'Cache-Control': CACHE },
     });
   } catch {
-    return NextResponse.json(seedVisitorMapData, {
-      headers: { 'Cache-Control': 'public, s-maxage=3600' },
+    return NextResponse.json([], {
+      headers: { 'Cache-Control': CACHE },
     });
   }
 }

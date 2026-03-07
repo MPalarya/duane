@@ -9,10 +9,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const country = req.headers.get('x-vercel-ip-country');
-    if (!country) {
-      return NextResponse.json({ ok: true });
-    }
+    const country = req.headers.get('x-vercel-ip-country')
+      || req.headers.get('cf-ipcountry')
+      || 'XX';
 
     await db
       .insert(loginsByCountry)

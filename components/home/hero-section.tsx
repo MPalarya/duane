@@ -105,29 +105,37 @@ export function HeroSection() {
   );
 
   useEffect(() => {
-    fetch('/api/visitor-map')
-      .then((r) => r.json())
-      .then((data: VisitorData[]) => {
-        const maxCount = Math.max(...data.map((d) => d.count), 1);
-        let total = 0;
-        const mapped: GlobeMarker[] = [];
-        for (const { code, count } of data) {
-          total += count;
-          const coords = COUNTRY_COORDS[code];
-          if (coords) {
-            mapped.push({
-              location: coords,
-              size: 0.05 + (count / maxCount) * 0.2,
-              code,
-              count,
-            });
+    function loadMap() {
+      fetch('/api/visitor-map')
+        .then((r) => r.json())
+        .then((data: VisitorData[]) => {
+          const maxCount = Math.max(...data.map((d) => d.count), 1);
+          let total = 0;
+          const mapped: GlobeMarker[] = [];
+          for (const { code, count } of data) {
+            total += count;
+            const coords = COUNTRY_COORDS[code];
+            if (coords) {
+              mapped.push({
+                location: coords,
+                size: 0.05 + (count / maxCount) * 0.2,
+                code,
+                count,
+              });
+            }
           }
-        }
-        setMarkers(mapped);
-        setTotalLogins(total);
-        setVisitorData(data);
-      })
-      .catch(() => {});
+          setMarkers(mapped);
+          setTotalLogins(total);
+          setVisitorData(data);
+        })
+        .catch(() => {});
+    }
+
+    // Fetch immediately for returning visitors, then re-fetch after
+    // track-login has had time to persist the current visit.
+    loadMap();
+    const timer = setTimeout(loadMap, 1500);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
