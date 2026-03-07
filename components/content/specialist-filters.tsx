@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Link } from '@/lib/i18n/navigation';
+import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
 interface Specialist {

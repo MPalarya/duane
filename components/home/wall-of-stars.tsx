@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef } from 'react';
-import { useTranslations } from 'next-intl';
 import { motion, useInView } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { seedSpotlightPeople } from '@/lib/seed-data';
@@ -17,7 +16,6 @@ const itemVariants = {
 };
 
 export function WallOfStars() {
-  const t = useTranslations('home.wallOfStars');
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: '-80px' });
@@ -40,21 +38,21 @@ export function WallOfStars() {
     >
       <div className="mx-auto max-w-6xl">
         <h2 className="mb-10 text-center text-3xl font-bold text-white">
-          {t('title')}
+          Wall of Stars
         </h2>
 
         <div className="relative">
           {/* Scroll buttons */}
           <button
             onClick={() => scroll('left')}
-            aria-label={t('scrollLeft')}
+            aria-label="Scroll left"
             className="absolute start-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
           >
             <ChevronLeft size={24} aria-hidden="true" />
           </button>
           <button
             onClick={() => scroll('right')}
-            aria-label={t('scrollRight')}
+            aria-label="Scroll right"
             className="absolute end-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
           >
             <ChevronRight size={24} aria-hidden="true" />
@@ -63,7 +61,7 @@ export function WallOfStars() {
           <motion.div
             ref={scrollRef}
             role="list"
-            aria-label={t('carouselLabel')}
+            aria-label="Community spotlight carousel"
             variants={containerVariants}
             initial="hidden"
             animate={inView ? 'visible' : 'hidden'}

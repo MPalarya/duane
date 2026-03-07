@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
 import { LockOpen, Lock, FileText, ExternalLink, Heart, MessageCircle } from 'lucide-react';
 
@@ -59,8 +58,6 @@ export function ResearchCard({
   likeCount?: number;
   onLikeChange?: (paperId: string, delta: number) => void;
 }) {
-  const t = useTranslations('research');
-
   // Default tab: if aiSummaryAdult is null, fall back to 'abstract'
   const defaultLevel: SummaryLevel = paper.aiSummaryAdult ? 'adult' : 'abstract';
   const [level, setLevel] = useState<SummaryLevel>(defaultLevel);
@@ -139,10 +136,10 @@ export function ResearchCard({
   const isAiLevel = level !== 'abstract';
 
   const tabLabels: Record<SummaryLevel, string> = {
-    simple: t('tabSimple'),
-    adult: t('tabStandard'),
-    professional: t('tabTechnical'),
-    abstract: t('tabOriginal'),
+    simple: 'Simple',
+    adult: 'Standard',
+    professional: 'Technical',
+    abstract: 'Original',
   };
 
   return (
@@ -153,11 +150,11 @@ export function ResearchCard({
           {paper.isOpenAccess != null && (
             paper.isOpenAccess ? (
               <Badge className="gap-1 bg-green-100 text-green-700 hover:bg-green-100">
-                <LockOpen className="h-3 w-3" /> {t('accessOpen')}
+                <LockOpen className="h-3 w-3" /> Open Access
               </Badge>
             ) : (
               <Badge className="gap-1 bg-amber-100 text-amber-700 hover:bg-amber-100">
-                <Lock className="h-3 w-3" /> {t('accessPaywalled')}
+                <Lock className="h-3 w-3" /> Paywalled
               </Badge>
             )
           )}
@@ -179,11 +176,11 @@ export function ResearchCard({
           {paper.isOpenAccess != null && (
             paper.isOpenAccess ? (
               <Badge className="gap-1 bg-green-100 text-green-700 hover:bg-green-100">
-                <LockOpen className="h-3 w-3" /> {t('accessOpen')}
+                <LockOpen className="h-3 w-3" /> Open Access
               </Badge>
             ) : (
               <Badge className="gap-1 bg-amber-100 text-amber-700 hover:bg-amber-100">
-                <Lock className="h-3 w-3" /> {t('accessPaywalled')}
+                <Lock className="h-3 w-3" /> Paywalled
               </Badge>
             )
           )}
@@ -211,7 +208,7 @@ export function ResearchCard({
           </Badge>
         )}
         {paper.citationCount != null && paper.citationCount > 0 && (
-          <span className="text-xs">{t('citations', { count: paper.citationCount })}</span>
+          <span className="text-xs">{paper.citationCount} citations</span>
         )}
       </div>
       {paper.authors && (
@@ -226,7 +223,7 @@ export function ResearchCard({
           rel="noopener noreferrer"
           className="mt-2 inline-flex items-center gap-1 text-sm text-green-700 hover:underline"
         >
-          <FileText className="h-3.5 w-3.5" /> {t('fullTextPdf')}
+          <FileText className="h-3.5 w-3.5" /> Full text PDF
           <ExternalLink className="h-3 w-3" />
         </a>
       )}
@@ -255,20 +252,20 @@ export function ResearchCard({
             <p>{summaryContent[level]}</p>
             {isAiLevel && hasConclusions && (
               <p className="mt-2 text-xs text-warm-400 italic">
-                {t('aiNote')}
+                AI summary based on abstract + full-text conclusions
               </p>
             )}
           </>
         ) : (
           <p className="text-warm-400 italic">
-            {level === 'abstract' ? t('noAbstract') : t('noAiSummary')}
+            {level === 'abstract' ? 'No abstract available.' : 'AI summary not available for this paper.'}
           </p>
         )}
 
         {/* Show conclusions in Original tab */}
         {level === 'abstract' && paper.conclusions && (
           <div className="mt-4 rounded-lg border border-warm-100 bg-warm-50 p-3">
-            <p className="mb-1 text-xs font-medium text-warm-500">{t('conclusionsLabel')}</p>
+            <p className="mb-1 text-xs font-medium text-warm-500">Conclusions</p>
             <p className="text-sm text-warm-600">{paper.conclusions}</p>
           </div>
         )}
@@ -283,7 +280,7 @@ export function ResearchCard({
               ? 'bg-coral-100 text-coral-700'
               : 'bg-warm-50 text-warm-400 hover:bg-warm-100'
           }`}
-          aria-label={liked ? t('unlike') : t('like')}
+          aria-label={liked ? 'Unlike' : 'Like'}
         >
           <Heart className={`h-3.5 w-3.5 ${liked ? 'fill-current' : ''}`} />
           {likeCount}
@@ -292,7 +289,7 @@ export function ResearchCard({
         <div className="inline-flex cursor-default items-center gap-1.5 rounded-full bg-warm-50 px-3 py-1 text-xs font-medium text-warm-400">
           <MessageCircle className="h-3.5 w-3.5" />
           0
-          <span className="text-warm-300">({t('comingSoon')})</span>
+          <span className="text-warm-300">(Coming Soon)</span>
         </div>
       </div>
     </div>

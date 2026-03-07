@@ -1,5 +1,4 @@
 import type { MetadataRoute } from 'next';
-import { locales } from '@/lib/i18n/config';
 
 const baseUrl = 'https://duane-syndrome.com';
 
@@ -30,22 +29,8 @@ const staticPages = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const entries: MetadataRoute.Sitemap = [];
-
-  for (const page of staticPages) {
-    const alternates: Record<string, string> = {};
-    for (const locale of locales) {
-      alternates[locale] = `${baseUrl}/${locale}${page}`;
-    }
-
-    entries.push({
-      url: `${baseUrl}/en${page}`,
-      lastModified: new Date(),
-      alternates: {
-        languages: alternates,
-      },
-    });
-  }
-
-  return entries;
+  return staticPages.map((page) => ({
+    url: `${baseUrl}${page}`,
+    lastModified: new Date(),
+  }));
 }

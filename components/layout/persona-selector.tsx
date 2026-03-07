@@ -1,18 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
-import { useRouter } from '@/lib/i18n/navigation';
+import { useRouter } from 'next/navigation';
 import { type Persona, getPersona, setPersona } from '@/lib/persona';
 
-const personas: { key: Persona; emoji: string; href: string }[] = [
-  { key: 'patient', emoji: '🌟', href: '/about' },
-  { key: 'parent', emoji: '💙', href: '/about' },
-  { key: 'friend', emoji: '🤝', href: '/about' },
+const personas: { key: Persona; emoji: string; label: string; desc: string; href: string }[] = [
+  { key: 'patient', emoji: '🌟', label: 'A person with Duane Syndrome', desc: 'Tips, community, and tools for living your best life', href: '/about' },
+  { key: 'parent', emoji: '💙', label: 'A parent or caregiver', desc: 'Guidance, specialists, and support for your child', href: '/about' },
+  { key: 'friend', emoji: '🤝', label: 'A friend, family member, or educator', desc: 'Understand Duane Syndrome and how to be supportive', href: '/about' },
 ];
 
 export function PersonaSelector() {
-  const t = useTranslations('home.persona');
   const router = useRouter();
   const [selected, setSelected] = useState<Persona | null>(null);
 
@@ -28,7 +26,7 @@ export function PersonaSelector() {
 
   return (
     <div className="grid gap-4 sm:grid-cols-3">
-      {personas.map(({ key, emoji, href }) => (
+      {personas.map(({ key, emoji, label, desc, href }) => (
         <button
           key={key}
           onClick={() => handleSelect(key, href)}
@@ -42,10 +40,10 @@ export function PersonaSelector() {
             {emoji}
           </span>
           <h3 className="mt-3 text-lg font-semibold text-warm-800 group-hover:text-primary-700">
-            {t(key)}
+            {label}
           </h3>
           <p className="mt-2 text-sm text-warm-500">
-            {t(`${key}Desc`)}
+            {desc}
           </p>
         </button>
       ))}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Link } from '@/lib/i18n/navigation';
+import Link from 'next/link';
 
 interface Question {
   id: string;

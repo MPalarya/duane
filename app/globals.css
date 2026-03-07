@@ -84,8 +84,3 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
-
-/* RTL-specific utilities */
-[dir="rtl"] {
-  text-align: right;
-}

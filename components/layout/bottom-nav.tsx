@@ -1,25 +1,24 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-import { Link, usePathname } from '@/lib/i18n/navigation';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Home, FlaskConical, Users, Wrench, User } from 'lucide-react';
 
 const tabs = [
-  { href: '/' as const, icon: Home, labelKey: 'home' },
-  { href: '/research' as const, icon: FlaskConical, labelKey: 'research' },
-  { href: '/community' as const, icon: Users, labelKey: 'community' },
-  { href: '/tools' as const, icon: Wrench, labelKey: 'tools' },
-  { href: '/community/mentors' as const, icon: User, labelKey: 'profile' },
+  { href: '/', icon: Home, label: 'Home' },
+  { href: '/research', icon: FlaskConical, label: 'Research' },
+  { href: '/community', icon: Users, label: 'Community' },
+  { href: '/tools', icon: Wrench, label: 'Tools' },
+  { href: '/community/mentors', icon: User, label: 'Profile' },
 ] as const;
 
 export function BottomNav() {
-  const t = useTranslations('nav');
   const pathname = usePathname();
 
   return (
     <nav
       role="navigation"
-      aria-label={t('mobileNavLabel')}
+      aria-label="Main navigation"
       className="fixed bottom-0 inset-x-0 z-50 border-t border-warm-300 bg-white/95 backdrop-blur-sm pb-[env(safe-area-inset-bottom)] lg:hidden"
     >
       <ul className="flex items-center justify-around">
@@ -46,7 +45,7 @@ export function BottomNav() {
                   strokeWidth={isActive ? 2.5 : 2}
                   aria-hidden="true"
                 />
-                <span>{t(tab.labelKey)}</span>
+                <span>{tab.label}</span>
               </Link>
             </li>
           );

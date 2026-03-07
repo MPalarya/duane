@@ -1,13 +1,11 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
 import { motion, useInView } from 'framer-motion';
 import { Sparkles, ThumbsUp, MessageSquare } from 'lucide-react';
 import { seedHackOfWeek } from '@/lib/seed-data';
 
 export function HackWidget() {
-  const t = useTranslations('home.hackOfWeek');
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
   const [upvoted, setUpvoted] = useState(false);
@@ -26,21 +24,21 @@ export function HackWidget() {
         <div className="mb-4 flex items-center gap-2 text-coral-600">
           <Sparkles size={22} aria-hidden="true" />
           <span className="text-sm font-bold uppercase tracking-wide">
-            {t('label')}
+            Hack of the Week
           </span>
         </div>
 
         <h3 className="text-xl font-bold text-primary-900">{hack.title}</h3>
         <p className="mt-2 text-warm-600">{hack.content}</p>
         <p className="mt-3 text-sm text-warm-500">
-          {t('submittedBy')} <span className="font-medium">{hack.author}</span>
+          Submitted by <span className="font-medium">{hack.author}</span>
         </p>
 
         <div className="mt-5 flex items-center gap-5 border-t border-warm-200 pt-4">
           <button
             onClick={() => setUpvoted(!upvoted)}
             aria-pressed={upvoted}
-            aria-label={upvoted ? t('removeUpvote') : t('upvote')}
+            aria-label={upvoted ? 'Remove upvote' : 'Upvote'}
             className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
               upvoted
                 ? 'bg-coral-100 text-coral-700'
@@ -53,7 +51,7 @@ export function HackWidget() {
 
           <div className="inline-flex items-center gap-1.5 text-sm text-warm-500">
             <MessageSquare size={16} aria-hidden="true" />
-            {t('commentCount', { count: hack.comments.length })}
+            {hack.comments.length} comments
           </div>
         </div>
       </motion.div>

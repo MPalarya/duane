@@ -1,16 +1,15 @@
 'use client';
 
 import { useRef } from 'react';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/lib/i18n/navigation';
+import Link from 'next/link';
 import { motion, useInView } from 'framer-motion';
 import { HelpCircle, FlaskConical, MessageCircle, Lightbulb } from 'lucide-react';
 
 const cards = [
-  { key: 'understand', icon: HelpCircle, href: '/about' as const },
-  { key: 'research', icon: FlaskConical, href: '/research' as const },
-  { key: 'connect', icon: MessageCircle, href: '/community' as const },
-  { key: 'thrive', icon: Lightbulb, href: '/life-hacks' as const },
+  { title: 'Understand', desc: 'Learn about types, causes, and treatments of Duane Syndrome', icon: HelpCircle, href: '/about' },
+  { title: 'Research', desc: 'Explore the latest scientific studies with AI-powered summaries', icon: FlaskConical, href: '/research' },
+  { title: 'Connect', desc: 'Join a global community of patients, parents, and allies', icon: MessageCircle, href: '/community' },
+  { title: 'Thrive', desc: 'Discover daily tips and life hacks from people who get it', icon: Lightbulb, href: '/life-hacks' },
 ] as const;
 
 const containerVariants = {
@@ -26,7 +25,6 @@ const cardVariants = {
 };
 
 export function FourPaths() {
-  const t = useTranslations('home.paths');
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
@@ -34,7 +32,7 @@ export function FourPaths() {
     <section className="px-4 py-16 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <h2 className="mb-10 text-center text-3xl font-bold text-primary-900">
-          {t('title')}
+          Your Path Starts Here
         </h2>
 
         <motion.div
@@ -47,7 +45,7 @@ export function FourPaths() {
           {cards.map((card) => {
             const Icon = card.icon;
             return (
-              <motion.div key={card.key} variants={cardVariants}>
+              <motion.div key={card.title} variants={cardVariants}>
                 <Link
                   href={card.href}
                   className="group flex items-start gap-4 rounded-xl border border-warm-300 bg-card p-6 transition-all hover:border-coral-400 hover:shadow-lg"
@@ -57,10 +55,10 @@ export function FourPaths() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-primary-900 group-hover:text-coral-700">
-                      {t(`${card.key}.title`)}
+                      {card.title}
                     </h3>
                     <p className="mt-1 text-warm-600">
-                      {t(`${card.key}.desc`)}
+                      {card.desc}
                     </p>
                   </div>
                 </Link>

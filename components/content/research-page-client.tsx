@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { ResearchCard } from './research-card';
@@ -38,8 +37,6 @@ interface Props {
 }
 
 export function ResearchPageClient({ papers, likeCounts: initialLikeCounts }: Props) {
-  const t = useTranslations('research');
-
   // Lifted like counts state so popularity sort updates immediately
   const [likeCounts, setLikeCounts] = useState(initialLikeCounts);
 
@@ -75,26 +72,26 @@ export function ResearchPageClient({ papers, likeCounts: initialLikeCounts }: Pr
 
   // Build active filters list for chip display
   const sourceLabels: Record<SourceFilter, string> = {
-    all: t('sourceAll'),
+    all: 'All',
     pubmed: 'PubMed',
     europepmc: 'Europe PMC',
     semanticscholar: 'Semantic Scholar',
   };
   const sortLabels: Record<SortOption, string> = {
-    newest: t('sortNewest'),
-    popular: t('sortPopular'),
-    cited: t('sortCited'),
+    newest: 'Newest',
+    popular: 'Most Popular',
+    cited: 'Most Cited',
   };
   const accessLabels: Record<AccessFilter, string> = {
-    all: t('accessAll'),
-    open: t('accessOpen'),
-    paywalled: t('accessPaywalled'),
+    all: 'All',
+    open: 'Open Access',
+    paywalled: 'Paywalled',
   };
 
   const activeFilters = useMemo(() => {
     const filters: ActiveFilter[] = [];
     if (sort !== 'newest') {
-      filters.push({ type: 'sort', label: `${t('sortLabel')}: ${sortLabels[sort]}`, value: sort });
+      filters.push({ type: 'sort', label: `Sort: ${sortLabels[sort]}`, value: sort });
     }
     for (const kw of keywords) {
       filters.push({ type: 'keyword', label: `"${kw}"`, value: kw });
@@ -230,7 +227,7 @@ export function ResearchPageClient({ papers, likeCounts: initialLikeCounts }: Pr
               className="fixed inset-y-0 end-0 z-50 w-72 overflow-y-auto bg-white p-6 shadow-xl lg:hidden"
             >
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-warm-900">{t('filters')}</h2>
+                <h2 className="text-lg font-semibold text-warm-900">Filters</h2>
                 <button
                   onClick={() => setMobileFiltersOpen(false)}
                   className="rounded-lg p-1 text-warm-400 hover:bg-warm-100"
@@ -249,12 +246,12 @@ export function ResearchPageClient({ papers, likeCounts: initialLikeCounts }: Pr
         {/* Header row: count + filter icon (mobile) */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-warm-400">
-            {t('paperCount', { filtered: filtered.length, total: papers.length })}
+            {filtered.length} / {papers.length} papers
           </p>
           <button
             onClick={() => setMobileFiltersOpen(true)}
             className="rounded-lg p-1.5 text-warm-400 hover:bg-warm-100 lg:hidden"
-            aria-label={t('filters')}
+            aria-label="Filters"
           >
             <SlidersHorizontal className="h-5 w-5" />
           </button>
@@ -281,14 +278,14 @@ export function ResearchPageClient({ papers, likeCounts: initialLikeCounts }: Pr
               onClick={clearAll}
               className="text-xs font-medium text-primary-600 hover:underline"
             >
-              {t('clearAll')}
+              Clear all
             </button>
           </div>
         )}
 
         {filtered.length === 0 ? (
           <div className="rounded-xl border border-warm-200 bg-warm-50 p-8 text-center">
-            <p className="text-warm-500">{t('noResults')}</p>
+            <p className="text-warm-500">No papers match your filters. Try adjusting or clearing them.</p>
           </div>
         ) : (
           <AnimatePresence mode="popLayout">

@@ -1,33 +1,31 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Link, usePathname } from '@/lib/i18n/navigation';
-import { LocaleSwitcher } from './locale-switcher';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { AuthButtons } from './auth-buttons';
 import { Button } from '@/components/ui/button';
 
 export function Header() {
-  const t = useTranslations('nav');
   const pathname = usePathname();
   const [toolsOpen, setToolsOpen] = useState(false);
 
   const navItems = [
-    { href: '/about', label: t('about') },
-    { href: '/research', label: t('research') },
-    { href: '/specialists', label: t('specialists') },
-    { href: '/community', label: t('community') },
-    { href: '/life-hacks', label: t('lifeHacks') },
+    { href: '/about', label: 'About Duane' },
+    { href: '/research', label: 'Research' },
+    { href: '/specialists', label: 'Specialists' },
+    { href: '/community', label: 'Community' },
+    { href: '/life-hacks', label: 'Life Hacks' },
   ];
 
   const toolItems = [
-    { href: '/tools/gaze-simulator', label: t('gazeSimulator') },
-    { href: '/tools/screening', label: t('screening') },
-    { href: '/tools/one-pager', label: t('onePager') },
-    { href: '/tools/explain-templates', label: t('explainTemplates') },
-    { href: '/tools/emergency-card', label: t('emergencyCard') },
-    { href: '/tools/exercise-tracker', label: t('exerciseTracker') },
+    { href: '/tools/gaze-simulator', label: 'Gaze Simulator' },
+    { href: '/tools/screening', label: 'Screening Tool' },
+    { href: '/tools/one-pager', label: 'My DS Card' },
+    { href: '/tools/explain-templates', label: 'Explain Templates' },
+    { href: '/tools/emergency-card', label: 'Emergency Card' },
+    { href: '/tools/exercise-tracker', label: 'Exercise Tracker' },
   ];
 
   return (
@@ -87,7 +85,7 @@ export function Header() {
                     : 'text-warm-600 hover:bg-warm-100 hover:text-primary-900'
                 }`}
               >
-                {t('tools')} <span className="text-xs">▾</span>
+                Tools <span className="text-xs">▾</span>
               </Link>
               {toolsOpen && (
                 <div className="absolute right-0 top-full z-50 w-56 rounded-lg border border-warm-300 bg-white py-1 shadow-lg">
@@ -111,18 +109,16 @@ export function Header() {
 
             <Link href="/community">
               <Button variant="primary" size="sm" className="ms-2 bg-coral-500 text-primary-900 hover:bg-coral-400">
-                {t('joinCommunity')}
+                Join Community
               </Button>
             </Link>
 
-            <LocaleSwitcher />
             <AuthButtons />
           </nav>
 
-          {/* Mobile: only auth + locale (nav moved to bottom bar) */}
+          {/* Mobile: only auth (nav moved to bottom bar) */}
           <div className="flex items-center gap-2 lg:hidden">
             <AuthButtons size="sm" />
-            <LocaleSwitcher />
           </div>
         </div>
       </header>

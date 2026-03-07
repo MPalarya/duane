@@ -1,7 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-import { Link } from '@/lib/i18n/navigation';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { CobeGlobe, type GlobeMarker } from './cobe-globe';
@@ -73,7 +72,6 @@ interface ActivePopup {
 }
 
 export function HeroSection() {
-  const t = useTranslations('home.hero');
   const [markers, setMarkers] = useState<GlobeMarker[]>([]);
   const [totalLogins, setTotalLogins] = useState(0);
   const [visitorData, setVisitorData] = useState<VisitorData[]>([]);
@@ -152,7 +150,7 @@ export function HeroSection() {
             transition={{ duration: 0.6 }}
             className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl"
           >
-            {t('title')}
+            One Shared Vision
           </motion.h1>
 
           <motion.p
@@ -161,7 +159,7 @@ export function HeroSection() {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="mt-4 text-xl text-accent-200 sm:text-2xl"
           >
-            {t('subtitle')}
+            Your home for research, lived experiences, and meaningful connection in the Duane Syndrome community.
           </motion.p>
 
           <motion.p
@@ -170,7 +168,7 @@ export function HeroSection() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="mx-auto mt-6 max-w-2xl text-lg text-warm-300 lg:mx-0"
           >
-            {t('description')}
+            Whether you&apos;re a patient, a parent, or a medical professional, we provide a space to navigate the unique challenges of DS together. From the latest clinical breakthroughs to the stories that make us feel seen, we are here to bridge the gap between diagnosis and daily life.
           </motion.p>
 
           <motion.div
@@ -183,13 +181,13 @@ export function HeroSection() {
               href="/about"
               className="inline-flex items-center rounded-lg bg-coral-500 px-6 py-3 text-base font-semibold text-primary-900 transition-colors hover:bg-coral-400 focus:outline-none focus:ring-2 focus:ring-coral-300 focus:ring-offset-2 focus:ring-offset-primary-900"
             >
-              {t('ctaPrimary')}
+              Learn About Duane Syndrome
             </Link>
             <Link
               href="/community"
               className="inline-flex items-center rounded-lg border-2 border-white/30 px-6 py-3 text-base font-semibold text-white transition-colors hover:border-white/60 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-primary-900"
             >
-              {t('ctaSecondary')}
+              Join the Community
             </Link>
           </motion.div>
         </div>
@@ -251,7 +249,7 @@ export function HeroSection() {
 
           {totalLogins > 0 && (
             <p className="mt-2 text-center text-sm font-medium text-accent-200/80">
-              {t('globalCommunity')} — {t('loginCount', { count: totalLogins })}
+              Our Global Community — {totalLogins.toLocaleString()} logins worldwide
             </p>
           )}
         </motion.div>
