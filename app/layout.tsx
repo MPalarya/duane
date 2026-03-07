@@ -7,6 +7,7 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { LoginTracker } from '@/components/layout/login-tracker';
+import { ClarityInit } from '@/components/layout/clarity-init';
 import './globals.css';
 
 const inter = Inter({
@@ -65,6 +66,7 @@ export default function RootLayout({
         <InnerLayout>{children}</InnerLayout>
         <BottomNav />
         <LoginTracker />
+        <ClarityInit />
         <Analytics />
         <SpeedInsights />
       </body>
