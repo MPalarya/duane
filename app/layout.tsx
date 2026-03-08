@@ -7,6 +7,7 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { ScrollToTop } from '@/components/layout/scroll-to-top';
+import { ComingSoonModal } from '@/components/layout/coming-soon-modal';
 import { LoginTracker } from '@/components/layout/login-tracker';
 import { ClarityInit } from '@/components/layout/clarity-init';
 import './globals.css';
@@ -67,6 +68,7 @@ export default function RootLayout({
         <InnerLayout>{children}</InnerLayout>
         <BottomNav />
         <ScrollToTop />
+        <ComingSoonModal />
         <LoginTracker />
         <ClarityInit />
         <Analytics />
