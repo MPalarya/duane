@@ -6,6 +6,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { BottomNav } from '@/components/layout/bottom-nav';
+import { ScrollToTop } from '@/components/layout/scroll-to-top';
 import { LoginTracker } from '@/components/layout/login-tracker';
 import { ClarityInit } from '@/components/layout/clarity-init';
 import './globals.css';
@@ -65,6 +66,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <InnerLayout>{children}</InnerLayout>
         <BottomNav />
+        <ScrollToTop />
         <LoginTracker />
         <ClarityInit />
         <Analytics />

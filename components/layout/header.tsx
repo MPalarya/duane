@@ -44,11 +44,11 @@ export function Header() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/logo.png"
+              src="/images/logo.svg"
               alt="Duane Syndrome"
-              width={40}
+              width={46}
               height={40}
-              className="rounded-md"
+              className="shrink-0"
             />
             <span className="text-xl font-bold text-primary-800">
               Duane Syndrome

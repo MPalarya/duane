@@ -8,6 +8,7 @@ const staticPages = [
   '/about/types',
   '/about/treatments',
   '/about/faq',
+  '/about/mission',
   '/community/blog',
   '/research',
   '/specialists',
@@ -26,6 +27,9 @@ const staticPages = [
   '/legal',
   '/submit',
   '/subscribe',
+  '/privacy',
+  '/terms',
+  '/contact',
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
