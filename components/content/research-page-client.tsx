@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SlidersHorizontal, X } from 'lucide-react';
-import { ResearchCard } from './research-card';
+import { ResearchCard, type SummaryLevel } from './research-card';
 import {
   ResearchFilters,
   type SortOption,
@@ -31,17 +32,63 @@ export interface ResearchPaper {
   citationCount: number | null;
 }
 
+export interface EngagementCounts {
+  copy: number;
+  share: number;
+}
+
 interface Props {
   papers: ResearchPaper[];
   likeCounts: Record<string, number>;
+  engagementCounts: Record<string, EngagementCounts>;
+  commentCounts: Record<string, number>;
 }
 
-export function ResearchPageClient({ papers, likeCounts: initialLikeCounts }: Props) {
-  // Lifted like counts state so popularity sort updates immediately
+const VALID_LEVELS = new Set<SummaryLevel>(['simple', 'adult', 'professional', 'abstract']);
+
+export function ResearchPageClient({ papers, likeCounts: initialLikeCounts, engagementCounts: initialEngagement, commentCounts: initialCommentCounts }: Props) {
+  const searchParams = useSearchParams();
+  const focusPaperId = searchParams.get('paper');
+  const urlLevel = searchParams.get('level') as SummaryLevel | null;
+  const initialLevel = urlLevel && VALID_LEVELS.has(urlLevel) ? urlLevel : undefined;
+
+  // Scroll to the focused paper on mount
+  useEffect(() => {
+    if (!focusPaperId) return;
+    // Delay to ensure DOM is rendered after hydration
+    const timer = setTimeout(() => {
+      const el = document.getElementById(`paper-${focusPaperId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Brief highlight
+        el.classList.add('ring-2', 'ring-primary-400');
+        setTimeout(() => el.classList.remove('ring-2', 'ring-primary-400'), 2000);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [focusPaperId]);
+
+  // Lifted counts state so popularity sort updates immediately
   const [likeCounts, setLikeCounts] = useState(initialLikeCounts);
+  const [engagementCounts, setEngagementCounts] = useState(initialEngagement);
+  const [commentCounts, setCommentCounts] = useState(initialCommentCounts);
 
   const handleLikeChange = useCallback((paperId: string, delta: number) => {
     setLikeCounts((prev) => ({
+      ...prev,
+      [paperId]: Math.max(0, (prev[paperId] || 0) + delta),
+    }));
+  }, []);
+
+  const handleEngagement = useCallback((paperId: string, type: 'copy' | 'share') => {
+    setEngagementCounts((prev) => {
+      const current = prev[paperId] || { copy: 0, share: 0 };
+      return { ...prev, [paperId]: { ...current, [type]: current[type] + 1 } };
+    });
+  }, []);
+
+  const handleCommentCountChange = useCallback((paperId: string, delta: number) => {
+    setCommentCounts((prev) => ({
       ...prev,
       [paperId]: Math.max(0, (prev[paperId] || 0) + delta),
     }));
@@ -165,8 +212,12 @@ export function ResearchPageClient({ papers, likeCounts: initialLikeCounts }: Pr
     }
 
     if (sort === 'popular') {
+      const popularity = (id: string) => {
+        const eng = engagementCounts[id] || { copy: 0, share: 0 };
+        return (likeCounts[id] || 0) + eng.copy + eng.share + (commentCounts[id] || 0);
+      };
       result = [...result].sort((a, b) => {
-        const diff = (likeCounts[b.id] || 0) - (likeCounts[a.id] || 0);
+        const diff = popularity(b.id) - popularity(a.id);
         if (diff !== 0) return diff;
         return (b.publishedDate || '').localeCompare(a.publishedDate || '');
       });
@@ -183,7 +234,7 @@ export function ResearchPageClient({ papers, likeCounts: initialLikeCounts }: Pr
     }
 
     return result;
-  }, [papers, source, year, access, keywords, sort, likeCounts]);
+  }, [papers, source, year, access, keywords, sort, likeCounts, engagementCounts, commentCounts]);
 
   const filterProps = {
     sort,
@@ -302,6 +353,12 @@ export function ResearchPageClient({ papers, likeCounts: initialLikeCounts }: Pr
                   paper={paper}
                   likeCount={likeCounts[paper.id] || 0}
                   onLikeChange={handleLikeChange}
+                  engagement={engagementCounts[paper.id] || { copy: 0, share: 0 }}
+                  onEngagement={handleEngagement}
+                  commentCount={commentCounts[paper.id] || 0}
+                  onCommentCountChange={handleCommentCountChange}
+                  autoOpenComments={paper.id === focusPaperId && (commentCounts[paper.id] || 0) > 0}
+                  initialLevel={paper.id === focusPaperId ? initialLevel : undefined}
                 />
               </motion.div>
             ))}

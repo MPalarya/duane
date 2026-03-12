@@ -1,5 +1,5 @@
 import { db, isDbConfigured } from '@/lib/db/client';
-import { researchCache, researchLikes } from '@/lib/db/schema';
+import { researchCache, researchComments, researchEngagement, researchLikes } from '@/lib/db/schema';
 import { and, desc, gt, gte, isNotNull, like, or, sql } from 'drizzle-orm';
 import { seedResearchPapers } from '@/lib/seed-data';
 import { ResearchPageClient, type ResearchPaper } from '@/components/content/research-page-client';
@@ -9,6 +9,8 @@ export const dynamic = 'force-dynamic';
 export default async function ResearchPage() {
   let papers: ResearchPaper[] = [];
   let likeCounts: Record<string, number> = {};
+  let engagementCounts: Record<string, { copy: number; share: number }> = {};
+  let commentCounts: Record<string, number> = {};
 
   if (isDbConfigured) {
     try {
@@ -54,6 +56,36 @@ export default async function ResearchPage() {
       for (const row of counts) {
         likeCounts[row.paperId] = row.count;
       }
+
+      const engagementRows = await db
+        .select({
+          paperId: researchEngagement.paperId,
+          type: researchEngagement.type,
+          count: sql<number>`count(*)`.as('count'),
+        })
+        .from(researchEngagement)
+        .groupBy(researchEngagement.paperId, researchEngagement.type);
+
+      for (const row of engagementRows) {
+        if (!engagementCounts[row.paperId]) {
+          engagementCounts[row.paperId] = { copy: 0, share: 0 };
+        }
+        if (row.type === 'copy' || row.type === 'share') {
+          engagementCounts[row.paperId][row.type] = row.count;
+        }
+      }
+
+      const commentCountRows = await db
+        .select({
+          paperId: researchComments.paperId,
+          count: sql<number>`count(*)`.as('count'),
+        })
+        .from(researchComments)
+        .groupBy(researchComments.paperId);
+
+      for (const row of commentCountRows) {
+        commentCounts[row.paperId] = row.count;
+      }
     } catch {
       // DB not ready
     }
@@ -86,7 +118,7 @@ export default async function ResearchPage() {
           </p>
         </div>
       ) : (
-        <ResearchPageClient papers={papers} likeCounts={likeCounts} />
+        <ResearchPageClient papers={papers} likeCounts={likeCounts} engagementCounts={engagementCounts} commentCounts={commentCounts} />
       )}
     </div>
   );

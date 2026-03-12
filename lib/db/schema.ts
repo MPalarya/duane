@@ -142,6 +142,24 @@ export const researchLikes = sqliteTable('research_likes', {
   createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
 });
 
+// Research paper engagement (copy-link, share)
+export const researchEngagement = sqliteTable('research_engagement', {
+  id: text('id').primaryKey(),
+  paperId: text('paper_id').notNull(),
+  visitorId: text('visitor_id').notNull(),
+  type: text('type').notNull(), // 'copy' | 'share'
+  createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+// Research paper comments (auth required)
+export const researchComments = sqliteTable('research_comments', {
+  id: text('id').primaryKey(),
+  paperId: text('paper_id').notNull(),
+  userId: text('user_id').notNull().references(() => users.id),
+  text: text('text').notNull(),
+  createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
+});
+
 // Visitor login counts by country (for globe visualization)
 export const loginsByCountry = sqliteTable('logins_by_country', {
   countryCode: text('country_code').primaryKey(), // ISO alpha-2
