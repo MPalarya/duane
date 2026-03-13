@@ -1,7 +1,58 @@
-import Link from 'next/link';
 import { safeFetch } from '@/lib/sanity/client';
-import { communityLinksQuery } from '@/lib/sanity/queries';
-import { seedCommunityLinks } from '@/lib/seed-data';
+import {
+  featuredAdvocatesQuery,
+  allBlogPostsQuery,
+  communityLinksQuery,
+} from '@/lib/sanity/queries';
+import { db, isDbConfigured } from '@/lib/db/client';
+import { stories, mentorPosts } from '@/lib/db/schema';
+import { eq, desc } from 'drizzle-orm';
+import { fetchFollowerCount } from '@/lib/social-stats';
+import {
+  seedFeaturedAdvocates,
+  seedBlogPosts,
+  seedStories,
+  seedMentorPosts,
+  seedCommunityLinks,
+  seedPodcasts,
+} from '@/lib/seed-data';
+import { StickyNav } from '@/components/community/sticky-nav';
+import { VisionariesSection } from '@/components/community/visionaries-section';
+import type { FeaturedAdvocate } from '@/components/community/visionaries-section';
+import { StoryLibrary } from '@/components/community/story-library';
+import { NoteBoard } from '@/components/community/note-board';
+import { PodcastsSection } from '@/components/community/podcasts-section';
+import { SatelliteHub } from '@/components/community/satellite-hub';
+
+interface BlogPost {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  excerpt?: string;
+  publishedAt?: string;
+  readingTime?: number;
+  tags?: string[];
+  author?: { name: string };
+}
+
+interface Story {
+  id: string;
+  title: string;
+  profession: string | null;
+  content: string;
+  createdAt: string | null;
+}
+
+interface MentorPost {
+  id: string;
+  role: string;
+  bio: string;
+  contactMethod: string | null;
+  anonymous: boolean | null;
+  locale: string | null;
+  active: boolean | null;
+  createdAt: string | null;
+}
 
 interface CommunityLink {
   _id: string;
@@ -12,101 +63,93 @@ interface CommunityLink {
   memberCount?: number;
 }
 
-const platformIcons: Record<string, string> = {
-  facebook: '\uD83D\uDCD8',
-  reddit: '\uD83D\uDFE0',
-  discord: '\uD83D\uDCAC',
-  forum: '\uD83D\uDCAD',
-  organization: '\uD83C\uDFDB',
-  other: '\uD83D\uDD17',
-};
+async function enrichWithFollowerCounts(
+  advocates: FeaturedAdvocate[],
+): Promise<FeaturedAdvocate[]> {
+  return Promise.all(
+    advocates.map(async (advocate) => {
+      if (!advocate.socialLinks?.length) return advocate;
+      const enrichedLinks = await Promise.all(
+        advocate.socialLinks.map(async (link) => {
+          if (link.followers) return link;
+          const count = await fetchFollowerCount(link.url);
+          return count ? { ...link, followers: count } : link;
+        }),
+      );
+      return { ...advocate, socialLinks: enrichedLinks };
+    }),
+  );
+}
+
+async function fetchStoriesFromDb(): Promise<Story[]> {
+  if (!isDbConfigured) return [];
+  try {
+    return await db
+      .select()
+      .from(stories)
+      .where(eq(stories.approved, true))
+      .orderBy(desc(stories.createdAt));
+  } catch {
+    return [];
+  }
+}
+
+async function fetchMentorPostsFromDb(): Promise<MentorPost[]> {
+  if (!isDbConfigured) return [];
+  try {
+    return await db
+      .select()
+      .from(mentorPosts)
+      .where(eq(mentorPosts.active, true))
+      .orderBy(desc(mentorPosts.createdAt));
+  } catch {
+    return [];
+  }
+}
 
 export default async function CommunityPage() {
-  let links = (await safeFetch<CommunityLink[]>(communityLinksQuery)) ?? [];
-  if (links.length === 0) {
-    links = seedCommunityLinks;
-  }
+  const [
+    advocates,
+    blogPosts,
+    dbStories,
+    dbMentorPosts,
+    communityLinks,
+  ] = await Promise.all([
+    safeFetch<FeaturedAdvocate[]>(featuredAdvocatesQuery),
+    safeFetch<BlogPost[]>(allBlogPostsQuery),
+    fetchStoriesFromDb(),
+    fetchMentorPostsFromDb(),
+    safeFetch<CommunityLink[]>(communityLinksQuery),
+  ]);
+
+  // Seed data fallbacks
+  let enrichedAdvocates = advocates?.length ? advocates : seedFeaturedAdvocates;
+  enrichedAdvocates = await enrichWithFollowerCounts(enrichedAdvocates);
+  const posts = blogPosts?.length ? blogPosts : seedBlogPosts;
+  const allStories = dbStories.length > 0 ? dbStories : seedStories;
+  const allMentorPosts = dbMentorPosts.length > 0 ? dbMentorPosts : seedMentorPosts;
+  const links = communityLinks?.length ? communityLinks : seedCommunityLinks;
+  const podcasts = seedPodcasts;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-warm-900">Community</h1>
       <p className="mt-4 text-warm-600">
-        Connect with the global Duane Syndrome community through these groups, forums, and organizations.
+        Your hub for everything Duane Syndrome — stories, mentors, podcasts, and connections.
       </p>
 
-      {/* Sub-sections */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Link
-          href="/community/mentors"
-          className="group rounded-xl border border-warm-200 bg-card p-6 text-center transition-all hover:border-primary-300 hover:shadow-md"
-        >
-          <span className="text-3xl">{'\uD83E\uDD1D'}</span>
-          <h2 className="mt-2 text-lg font-semibold text-primary-700">Mentors</h2>
-          <p className="mt-1 text-sm text-warm-500">Find or become a mentor</p>
-        </Link>
-        <Link
-          href="/community/stories"
-          className="group rounded-xl border border-warm-200 bg-card p-6 text-center transition-all hover:border-primary-300 hover:shadow-md"
-        >
-          <span className="text-3xl">{'\u2B50'}</span>
-          <h2 className="mt-2 text-lg font-semibold text-primary-700">Stories</h2>
-          <p className="mt-1 text-sm text-warm-500">Success stories</p>
-        </Link>
-        <Link
-          href="/community/spotlight"
-          className="group rounded-xl border border-warm-200 bg-card p-6 text-center transition-all hover:border-primary-300 hover:shadow-md"
-        >
-          <span className="text-3xl">{'\u2728'}</span>
-          <h2 className="mt-2 text-lg font-semibold text-primary-700">Spotlight</h2>
-          <p className="mt-1 text-sm text-warm-500">Known people</p>
-        </Link>
-        <Link
-          href="/community/blog"
-          className="group rounded-xl border border-warm-200 bg-card p-6 text-center transition-all hover:border-primary-300 hover:shadow-md"
-        >
-          <span className="text-3xl">{'\uD83D\uDCDD'}</span>
-          <h2 className="mt-2 text-lg font-semibold text-primary-700">Blog</h2>
-          <p className="mt-1 text-sm text-warm-500">Community articles</p>
-        </Link>
-      </div>
+      <StickyNav />
 
-      {/* Community Links */}
-      {links.length > 0 ? (
-        <div className="mt-10">
-          <h2 className="text-2xl font-semibold text-warm-800">Communities & Groups</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            {links.map((link) => (
-              <a
-                key={link._id}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group rounded-xl border border-warm-200 bg-card p-5 transition-all hover:border-primary-300 hover:shadow-md"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">{platformIcons[link.platform || 'other']}</span>
-                  <div>
-                    <h3 className="font-semibold text-warm-900 group-hover:text-primary-700">{link.name}</h3>
-                    {link.description && (
-                      <p className="mt-1 text-sm text-warm-500">{link.description}</p>
-                    )}
-                    {link.memberCount && (
-                      <p className="mt-1 text-xs text-warm-400">{link.memberCount.toLocaleString()} members</p>
-                    )}
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
+      <div className="mt-8 space-y-16">
+        <VisionariesSection advocates={enrichedAdvocates} />
+        <StoryLibrary blogPosts={posts} stories={allStories} />
+        <NoteBoard posts={allMentorPosts} />
+        {/* Podcasts + Groups side by side on desktop */}
+        <div className="grid gap-10 lg:grid-cols-2 lg:gap-8">
+          <PodcastsSection podcasts={podcasts} />
+          <SatelliteHub links={links} />
         </div>
-      ) : (
-        <div className="mt-10 rounded-xl border border-warm-200 bg-warm-50 p-8 text-center">
-          <p className="text-warm-500">
-            Community links are being curated. Check back soon or{' '}
-            <Link href="/submit" className="text-primary-600 hover:underline">suggest a community</Link>.
-          </p>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

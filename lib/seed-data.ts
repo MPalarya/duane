@@ -267,8 +267,8 @@ export const seedBlogPosts = [
 export const seedCommunityLinks = [
   {
     _id: 'seed-community-1',
-    name: 'Duane Syndrome Support Group (Facebook)',
-    url: 'https://www.facebook.com/groups/duanesyndrome',
+    name: 'Duane Syndrome Facebook Group',
+    url: 'https://www.facebook.com/groups/34842586609',
     platform: 'facebook',
     description: 'Active Facebook group with over 3,000 members. Parents, patients, and doctors share experiences and advice.',
     memberCount: 3200,
@@ -375,6 +375,24 @@ export const seedFeaturedAdvocates = [
     socialLinks: [
       { platform: 'instagram', url: 'https://www.instagram.com/theneurovisiondoc/' },
     ],
+  },
+];
+
+export const seedPodcasts = [
+  {
+    title: 'Life with Duane by Madaline McCabe',
+    platform: 'Spotify',
+    embedUrl: 'https://open.spotify.com/embed/episode/2xkgzEdAFEImnX1BzMSMrz',
+  },
+  {
+    title: 'Duane Syndrome with Dr. Srav Vegunta',
+    platform: 'Apple Podcasts',
+    embedUrl: 'https://embed.podcasts.apple.com/au/podcast/duane-syndrome-with-dr-srav-vegunta/id1449421786?i=1000642482879&theme=light',
+  },
+  {
+    title: 'Peyton\'s Duane Syndrome',
+    platform: 'Spotify',
+    embedUrl: 'https://open.spotify.com/embed/episode/2GVwQRQgs4zck2MFupGV5U',      
   },
 ];
 
