@@ -165,3 +165,12 @@ export const loginsByCountry = sqliteTable('logins_by_country', {
   countryCode: text('country_code').primaryKey(), // ISO alpha-2
   count: integer('count').notNull().default(0),
 });
+
+// Scan progress for historical article crawl (one row per source)
+export const scanProgress = sqliteTable('scan_progress', {
+  source: text('source').primaryKey(), // 'pubmed' | 'europepmc' | 'semanticscholar'
+  offsetValue: integer('offset_value').default(0),
+  cursorToken: text('cursor_token'),
+  completedAt: text('completed_at'),
+  updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`),
+});

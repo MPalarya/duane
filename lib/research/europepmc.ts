@@ -38,6 +38,57 @@ export async function searchEuropePmc(maxResults = 10): Promise<ResearchArticle[
   }));
 }
 
+/** Paginated scan for historical crawl. Uses cursor-based pagination. */
+export async function scanEuropePmc(
+  cursor: string,
+  batchSize = 100
+): Promise<{ articles: ResearchArticle[]; nextCursor: string | null }> {
+  const params = new URLSearchParams({
+    query: SEARCH_TERM,
+    resultType: 'core',
+    pageSize: String(batchSize),
+    sort: 'FIRST_PDATE desc',
+    format: 'json',
+    cursorMark: cursor,
+  });
+
+  const res = await fetch(`${EPMC_BASE}/search?${params}`);
+  if (!res.ok) {
+    console.error(`Europe PMC scan error: ${res.status}`);
+    return { articles: [], nextCursor: null };
+  }
+
+  const data = await res.json();
+  const results = data.resultList?.result ?? [];
+
+  if (results.length === 0) {
+    return { articles: [], nextCursor: null };
+  }
+
+  const articles = results.map((r: Record<string, unknown>) => ({
+    pubmedId: String(r.pmid ?? ''),
+    doi: (r.doi as string) ?? null,
+    pmcId: (r.pmcid as string) ?? null,
+    s2Id: null,
+    title: String(r.title ?? 'Untitled'),
+    abstract: String(r.abstractText ?? ''),
+    authors: formatAuthors(r.authorList),
+    journal: String(r.journalTitle ?? ''),
+    publishedDate: formatDate(r),
+    isOpenAccess: r.isOpenAccess === 'Y',
+    openAccessPdfUrl: null,
+    source: 'europepmc' as const,
+    citationCount: Number(r.citedByCount ?? 0),
+  }));
+
+  const nextCursor =
+    data.nextCursorMark && data.nextCursorMark !== cursor
+      ? data.nextCursorMark
+      : null;
+
+  return { articles, nextCursor };
+}
+
 export async function fetchFullTextXml(pmcId: string): Promise<string | null> {
   try {
     const res = await fetch(`${EPMC_BASE}/${pmcId}/fullTextXML`);

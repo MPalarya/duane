@@ -64,6 +64,28 @@ export async function fetchArticleDetails(ids: string[]): Promise<ResearchArticl
   return articles;
 }
 
+/** Paginated scan for historical crawl. Returns articles + next offset (null when done). */
+export async function scanPubMed(
+  offset: number,
+  batchSize = 100
+): Promise<{ articles: ResearchArticle[]; nextOffset: number | null; total: number }> {
+  const searchUrl = `${PUBMED_BASE}/esearch.fcgi?db=pubmed&term=${encodeURIComponent(SEARCH_TERM)}&retstart=${offset}&retmax=${batchSize}&sort=date&retmode=json`;
+
+  const res = await fetch(searchUrl);
+  const data = await res.json();
+  const ids: string[] = data.esearchresult?.idlist ?? [];
+  const total = Number(data.esearchresult?.count ?? 0);
+
+  if (ids.length === 0) {
+    return { articles: [], nextOffset: null, total };
+  }
+
+  const articles = await fetchArticleDetails(ids);
+  const nextOffset = offset + batchSize < total ? offset + batchSize : null;
+
+  return { articles, nextOffset, total };
+}
+
 function extractTag(xml: string, tagName: string): string | null {
   const match = xml.match(new RegExp(`<${tagName}[^>]*>([\\s\\S]*?)</${tagName}>`));
   return match ? match[1].trim() : null;

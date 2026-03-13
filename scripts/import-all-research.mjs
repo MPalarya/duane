@@ -3,7 +3,7 @@
  * Inserts without AI summaries — the daily cron fills those in gradually.
  *
  * Usage:
- *   source <(grep -E '^TURSO_' .env.local | sed 's/^/export /')
+ *   source <(grep -E '^(TURSO_|S2_API_KEY|SERPAPI_KEY)' .env.local | sed 's/^/export /')
  *   node scripts/import-all-research.mjs
  */
 
@@ -274,6 +274,97 @@ function formatEpmcDate(r) {
   return null;
 }
 
+// ── Semantic Scholar ─────────────────────────────────────────────────
+
+const S2_API_KEY = process.env.S2_API_KEY;
+const S2_BASE = 'https://api.semanticscholar.org/graph/v1';
+let s2LastRequest = 0;
+
+async function s2Throttle() {
+  const elapsed = Date.now() - s2LastRequest;
+  if (elapsed < 1050) await sleep(1050 - elapsed);
+  s2LastRequest = Date.now();
+}
+
+function s2Headers() {
+  const headers = { 'User-Agent': 'DuaneSyndromePortal/1.0 (research aggregator)' };
+  if (S2_API_KEY) headers['x-api-key'] = S2_API_KEY;
+  return headers;
+}
+
+async function fetchAllSemanticScholar() {
+  if (!S2_API_KEY) {
+    console.log('\n── Semantic Scholar: skipped (no S2_API_KEY) ──');
+    return [];
+  }
+
+  console.log('\n── Semantic Scholar (bulk search): fetching... ──');
+  const query = 'Duane syndrome OR Duane retraction syndrome';
+  const fields = 'title,abstract,authors,journal,year,publicationDate,externalIds,isOpenAccess,openAccessPdf,citationCount';
+  const articles = [];
+  let token = undefined;
+  let page = 0;
+
+  while (true) {
+    page++;
+    process.stdout.write(`  Page ${page}...`);
+
+    const params = new URLSearchParams({ query, fields });
+    if (token) params.set('token', token);
+
+    await s2Throttle();
+    const res = await fetch(`${S2_BASE}/paper/search/bulk?${params}`, { headers: s2Headers() });
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      console.log(` error ${res.status} — ${body.substring(0, 200)}`);
+      // Retry on 429
+      if (res.status === 429) {
+        console.log('  Rate limited, waiting 15s...');
+        await sleep(15000);
+        continue;
+      }
+      break;
+    }
+
+    const data = await res.json();
+    const papers = data.data ?? [];
+    console.log(` ${papers.length} articles`);
+
+    if (papers.length === 0) break;
+
+    for (const p of papers) {
+      if (!p.title) continue;
+      const externalIds = p.externalIds ?? {};
+      const oaPdf = p.openAccessPdf;
+
+      articles.push({
+        pubmedId: externalIds.PubMed || null,
+        doi: externalIds.DOI || null,
+        pmcId: externalIds.PubMedCentral ? `PMC${externalIds.PubMedCentral}` : null,
+        s2Id: String(p.paperId ?? ''),
+        title: String(p.title),
+        abstract: p.abstract ? String(p.abstract) : null,
+        authors: Array.isArray(p.authors)
+          ? p.authors.map((a) => a.name || '').filter(Boolean).join(', ')
+          : '',
+        journal: p.journal?.name || null,
+        publishedDate: p.publicationDate || (p.year ? `${p.year}-01-01` : null),
+        isOpenAccess: Boolean(p.isOpenAccess),
+        oaPdfUrl: oaPdf?.url || null,
+        source: 'semanticscholar',
+        citationCount: Number(p.citationCount ?? 0),
+      });
+    }
+
+    token = data.token;
+    if (!token) break;
+  }
+
+  console.log(`  Total Semantic Scholar articles: ${articles.length}`);
+  return articles;
+}
+
 // ── Google Scholar ───────────────────────────────────────────────────
 
 // ── Google Scholar via SerpAPI ───────────────────────────────────────
@@ -453,8 +544,8 @@ async function enrichScholarAbstracts(articles) {
 
 const pubmed = await fetchAllPubMed();
 const epmc = await fetchAllEuropePmc();
+const s2 = await fetchAllSemanticScholar();
 const scholar = await fetchAllGoogleScholar();
 // Fetch full abstracts from paper URLs for Scholar-only articles
 await enrichScholarAbstracts(scholar);
-// Skip Semantic Scholar — it overlaps heavily and we're rate-limited
-await importArticles([...pubmed, ...epmc, ...scholar]);
+await importArticles([...pubmed, ...epmc, ...s2, ...scholar]);
