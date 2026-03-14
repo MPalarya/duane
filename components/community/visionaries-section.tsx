@@ -7,6 +7,8 @@ export interface FeaturedAdvocate {
   tags?: string[];
   bio?: string;
   videoUrl: string;
+  directVideoUrl?: string;
+  thumbnailUrl?: string;
   socialLinks?: { platform: string; url: string; followers?: string }[];
 }
 

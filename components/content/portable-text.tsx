@@ -5,16 +5,43 @@ import { urlFor } from '@/lib/sanity/image';
 const components: PortableTextComponents = {
   types: {
     image: ({ value }) => {
-      if (!value?.asset?._ref) return null;
+      // Determine image source: Sanity asset ref, direct URL, or placeholder _imageUrl
+      let src: string | null = null;
+      const customWidth = value?.width as number | undefined;
+      if (value?.asset?._ref) {
+        src = urlFor(value).width(customWidth || 800).url();
+      } else if (value?.url) {
+        src = value.url;
+      } else if (value?._imageUrl) {
+        src = value._imageUrl;
+      }
+
+      if (!src) return null;
+
+      const style = customWidth
+        ? { width: `${customWidth}px`, maxWidth: '100%' }
+        : undefined;
+
       return (
-        <figure className="my-8">
-          <Image
-            src={urlFor(value).width(800).url()}
-            alt={value.alt || ''}
-            width={800}
-            height={450}
-            className="rounded-lg"
-          />
+        <figure className="my-8" style={style}>
+          {value?.asset?._ref ? (
+            <Image
+              src={src}
+              alt={value.alt || ''}
+              width={customWidth || 800}
+              height={customWidth ? Math.round(customWidth * 0.5625) : 450}
+              className="rounded-lg"
+              style={{ width: '100%', height: 'auto' }}
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={src}
+              alt={value.alt || ''}
+              className="rounded-lg"
+              style={{ width: '100%', height: 'auto' }}
+            />
+          )}
           {value.caption && (
             <figcaption className="mt-2 text-center text-sm text-warm-500">
               {value.caption}

@@ -1,13 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
-import { platformConfig } from './platform-icons';
-
-interface SocialLink {
-  platform: string;
-  url: string;
-  followers?: string;
-}
+import { useRef, useState } from 'react';
 
 export interface FeaturedAdvocate {
   _id: string;
@@ -15,77 +8,69 @@ export interface FeaturedAdvocate {
   tags?: string[];
   bio?: string;
   videoUrl: string;
-  socialLinks?: SocialLink[];
+  directVideoUrl?: string;
+  thumbnailUrl?: string;
+  socialLinks?: { platform: string; url: string; followers?: string }[];
 }
 
-const CARD_WIDTH = 300;
-const GAP = 16;
-const SCROLL_STEP = CARD_WIDTH + GAP;
+const CARD_W = 325;
+const SCROLL_STEP = CARD_W + 16;
 
 function AdvocateCard({ advocate }: { advocate: FeaturedAdvocate }) {
-  const isTikTok = advocate.videoUrl.includes('tiktok.com');
+  const [activated, setActivated] = useState(false);
+
+  if (!advocate.videoUrl) return null;
 
   return (
-    <div className="w-[300px] flex-shrink-0 overflow-hidden rounded-xl border border-warm-200 bg-card shadow-sm">
-      {/* Uniform video container — clips each platform's embed to a consistent height */}
-      <div className="relative h-[540px] overflow-hidden bg-warm-50">
+    <div className="w-[325px] flex-shrink-0">
+      {activated ? (
         <iframe
           src={advocate.videoUrl}
-          className={`absolute inset-x-0 top-0 w-full border-0 ${
-            isTikTok ? 'h-[740px]' : 'h-[640px]'
-          }`}
+          width={325}
+          height={750}
+          className="rounded-xl border-0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
-          loading="lazy"
           title={`Video featuring ${advocate.name}`}
         />
-      </div>
+      ) : (
+        <button
+          onClick={() => setActivated(true)}
+          className="group relative h-[750px] w-[325px] overflow-hidden rounded-xl bg-black"
+        >
+          {/* Thumbnail */}
+          {advocate.thumbnailUrl && (
+            <img
+              src={advocate.thumbnailUrl}
+              alt={advocate.name}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )}
 
-      <div className="p-4">
-        <h3 className="text-lg font-bold text-warm-900">{advocate.name}</h3>
-
-        {advocate.tags && advocate.tags.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {advocate.tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center gap-1.5 rounded-full border border-warm-200 bg-warm-50 px-2.5 py-0.5 text-xs font-medium text-warm-600"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-primary-600" />
-                {tag}
-              </span>
-            ))}
+          {/* Play button */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="rounded-full bg-black/40 p-5 backdrop-blur-sm transition-transform group-hover:scale-110">
+              <svg className="h-12 w-12 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
           </div>
-        )}
 
-        {advocate.socialLinks && advocate.socialLinks.length > 0 && (
-          <div className="mt-3 flex items-center gap-3">
-            {advocate.socialLinks.map((link) => {
-              const cfg = platformConfig[link.platform];
-              if (!cfg) return null;
-              return (
-                <a
-                  key={link.url}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={cfg.label}
-                  className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
-                >
-                  <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-white ${cfg.bg}`}>
-                    {cfg.icon}
+          {/* Bottom gradient with name */}
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-4 pb-4 pt-16">
+            <p className="text-base font-bold text-white drop-shadow-sm">{advocate.name}</p>
+            {advocate.tags && advocate.tags.length > 0 && (
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {advocate.tags.map((tag) => (
+                  <span key={tag} className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium text-white/90">
+                    {tag}
                   </span>
-                  {link.followers && (
-                    <span className="text-xs font-medium text-warm-400">
-                      {link.followers}
-                    </span>
-                  )}
-                </a>
-              );
-            })}
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </button>
+      )}
     </div>
   );
 }
@@ -95,13 +80,11 @@ export function AdvocateCarousel({ advocates, trailing }: { advocates: FeaturedA
 
   function scroll(direction: 'left' | 'right') {
     if (!scrollRef.current) return;
-    const delta = direction === 'left' ? -SCROLL_STEP : SCROLL_STEP;
-    scrollRef.current.scrollBy({ left: delta, behavior: 'smooth' });
+    scrollRef.current.scrollBy({ left: direction === 'left' ? -SCROLL_STEP : SCROLL_STEP, behavior: 'smooth' });
   }
 
   return (
     <div>
-      {/* Controls row — arrows + optional trailing element */}
       <div className="mb-3 flex items-center gap-2">
         <button
           onClick={() => scroll('left')}

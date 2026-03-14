@@ -8,6 +8,7 @@ import { db, isDbConfigured } from '@/lib/db/client';
 import { stories, mentorPosts } from '@/lib/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { fetchFollowerCount } from '@/lib/social-stats';
+import { fetchVideoThumbnail } from '@/lib/video-extract';
 import {
   seedFeaturedAdvocates,
   seedBlogPosts,
@@ -115,16 +116,25 @@ export default async function CommunityPage() {
     dbMentorPosts,
     communityLinks,
   ] = await Promise.all([
-    safeFetch<FeaturedAdvocate[]>(featuredAdvocatesQuery),
-    safeFetch<BlogPost[]>(allBlogPostsQuery),
+    safeFetch<FeaturedAdvocate[]>(featuredAdvocatesQuery, { locale: 'en' }),
+    safeFetch<BlogPost[]>(allBlogPostsQuery, { locale: 'en' }),
     fetchStoriesFromDb(),
     fetchMentorPostsFromDb(),
-    safeFetch<CommunityLink[]>(communityLinksQuery),
+    safeFetch<CommunityLink[]>(communityLinksQuery, { locale: 'en' }),
   ]);
 
   // Seed data fallbacks
   let enrichedAdvocates = advocates?.length ? advocates : seedFeaturedAdvocates;
   enrichedAdvocates = await enrichWithFollowerCounts(enrichedAdvocates);
+
+  // Fetch video thumbnails for click-to-load previews (skip if already set in seed/Sanity data)
+  enrichedAdvocates = await Promise.all(
+    enrichedAdvocates.map(async (a) => {
+      if (a.thumbnailUrl) return a;
+      const thumbnailUrl = await fetchVideoThumbnail(a.videoUrl, a.socialLinks);
+      return thumbnailUrl ? { ...a, thumbnailUrl } : a;
+    }),
+  );
   const posts = blogPosts?.length ? blogPosts : seedBlogPosts;
   const allStories = dbStories.length > 0 ? dbStories : seedStories;
   const allMentorPosts = dbMentorPosts.length > 0 ? dbMentorPosts : seedMentorPosts;

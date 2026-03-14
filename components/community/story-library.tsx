@@ -160,12 +160,18 @@ export function StoryLibrary({ blogPosts, stories }: StoryLibraryProps) {
         })}
       </div>
 
-      <div className="mt-6 text-center">
+      <div className="mt-6 flex flex-wrap justify-center gap-3">
         <Link
           href="/submit"
           className="inline-flex items-center gap-1.5 rounded-full border border-primary-300 bg-primary-50 px-5 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100"
         >
           + Share Your Story
+        </Link>
+        <Link
+          href="/community/submit-post"
+          className="inline-flex items-center gap-1.5 rounded-full border border-accent-300 bg-accent-50 px-5 py-2 text-sm font-medium text-accent-700 transition-colors hover:bg-accent-100"
+        >
+          + Write a Blog Post
         </Link>
       </div>
     </section>

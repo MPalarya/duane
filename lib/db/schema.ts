@@ -124,6 +124,25 @@ export const researchCache = sqliteTable('research_cache', {
   citationCount: integer('citation_count').default(0),
 });
 
+// Blog post submissions (user-submitted, admin-approved → published to Sanity)
+export const blogSubmissions = sqliteTable('blog_submissions', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  authorName: text('author_name').notNull(),
+  authorBio: text('author_bio'),
+  title: text('title').notNull(),
+  excerpt: text('excerpt'),
+  bodyMarkdown: text('body_markdown').notNull(),
+  bodyHtml: text('body_html').notNull(),
+  tags: text('tags'), // JSON array of strings
+  featuredImageUrl: text('featured_image_url'),
+  status: text('status').default('pending'), // pending | approved | rejected
+  adminNote: text('admin_note'),
+  sanityDocId: text('sanity_doc_id'), // set after publishing to Sanity
+  createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
+  updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`),
+});
+
 // Generic submissions
 export const submissions = sqliteTable('submissions', {
   id: text('id').primaryKey(),

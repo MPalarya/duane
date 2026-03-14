@@ -28,7 +28,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
 
-  const post = await safeFetch<BlogPost>(blogPostBySlugQuery, { slug });
+  const post = await safeFetch<BlogPost>(blogPostBySlugQuery, { slug, locale: 'en' });
   if (!post) return {};
 
   return {
@@ -44,7 +44,7 @@ export default async function BlogPostPage({
 }) {
   const { slug } = await params;
 
-  const post = await safeFetch<BlogPost>(blogPostBySlugQuery, { slug });
+  const post = await safeFetch<BlogPost>(blogPostBySlugQuery, { slug, locale: 'en' });
 
   if (!post) {
     notFound();

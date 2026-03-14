@@ -335,11 +335,22 @@ export const seedVisitorMapData: { code: string; count: number }[] = [
 
 export const seedFeaturedAdvocates = [
   {
+    _id: 'emily-didonato',
+    name: 'Emily DiDonato',
+    tags: ['Model'],
+    bio: 'International model and content creator who has openly shared her experience with Duane Syndrome, helping normalize the condition in the public eye.',
+    videoUrl: 'https://www.tiktok.com/embed/7462404378872417582',
+    socialLinks: [
+      { platform: 'instagram', url: 'https://www.instagram.com/emilydidonato/' },
+      { platform: 'tiktok', url: 'https://www.tiktok.com/@didonatoemily' },
+    ],
+  },
+  {
     _id: 'grace-mckagan',
     name: 'Grace McKagan',
     tags: ['Musician'],
     bio: 'Grace has spoken publicly about living with Duane Syndrome, helping raise awareness through her platform and inspiring others in the DS community.',
-    videoUrl: 'https://www.tiktok.com/embed/v2/7565165321137474830',
+    videoUrl: 'https://www.tiktok.com/embed/7565165321137474830',
     socialLinks: [
       { platform: 'instagram', url: 'https://www.instagram.com/gracemckagan/' },
       { platform: 'tiktok', url: 'https://www.tiktok.com/@gracemckagan97' },
@@ -350,20 +361,10 @@ export const seedFeaturedAdvocates = [
     name: 'Michelle Yates',
     tags: ['Nutritionist', 'Podcaster'],
     bio: 'Nutrition expert and content creator who shares her experience with Duane Syndrome, bringing visibility to the condition through her wellness-focused content.',
-    videoUrl: 'https://www.instagram.com/reel/Cl9MaHBORm0/embed/',
+    videoUrl: 'https://www.tiktok.com/embed/7161971837335883051',
     socialLinks: [
       { platform: 'instagram', url: 'https://www.instagram.com/yatesnutrition/' },
-    ],
-  },
-  {
-    _id: 'emily-didonato',
-    name: 'Emily DiDonato',
-    tags: ['Model'],
-    bio: 'International model and content creator who has openly shared her experience with Duane Syndrome, helping normalize the condition in the public eye.',
-    videoUrl: 'https://www.tiktok.com/embed/v2/7462404378872417582',
-    socialLinks: [
-      { platform: 'instagram', url: 'https://www.instagram.com/emilydidonato/' },
-      { platform: 'tiktok', url: 'https://www.tiktok.com/@didonatoemily' },
+      { platform: 'tiktok', url: 'https://www.tiktok.com/@yatesnutrition' },
     ],
   },
   {
@@ -372,6 +373,7 @@ export const seedFeaturedAdvocates = [
     tags: ['Doctor'],
     bio: 'Neuro-vision specialist who educates about Duane Syndrome and other vision conditions through her practice and social media presence.',
     videoUrl: 'https://www.instagram.com/reel/CwqHZc7p-29/embed/',
+    thumbnailUrl: 'https://scontent-mrs2-3.cdninstagram.com/v/t51.71878-15/496827558_659908083495979_6216036024076039258_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=0UzW93XbWQMQ7kNvwHEi1F-&_nc_oc=AdkxHnrXNIwAe5GRs6YlDaTGyknHSr4_f4lY9_1SqLdlmFo6PkzP9bdytKQIvUTmfJQ&_nc_zt=23&_nc_ht=scontent-mrs2-3.cdninstagram.com&_nc_gid=sXkDpg_J6z6T6hiWf8ZoYQ&_nc_ss=8&oh=00_AfxSOaXZ9cVdqSC3wITNlY1qsOXulwcR07_pP0uqxKwpKw&oe=69BB0DBE',
     socialLinks: [
       { platform: 'instagram', url: 'https://www.instagram.com/theneurovisiondoc/' },
     ],
