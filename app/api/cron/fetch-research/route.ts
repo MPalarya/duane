@@ -21,11 +21,57 @@ import { eq, isNull, isNotNull, or, sql } from 'drizzle-orm';
 export const maxDuration = 300; // 5 minutes
 
 const TAG = '[research-cron]';
+const TIME_LIMIT_MS = 270_000; // 270s — leave 30s buffer before Vercel's 300s limit
 
 function log(step: string, msg: string, data?: Record<string, unknown>) {
   const parts = [TAG, step, msg];
   if (data) parts.push(JSON.stringify(data));
   console.log(parts.join(' '));
+}
+
+function hasTimeLeft(startTime: number): boolean {
+  return Date.now() - startTime < TIME_LIMIT_MS;
+}
+
+
+interface StepResults {
+  newCount: number;
+  sourceCounts: Record<string, number>;
+  fullTextCount: number;
+  scanInserted: number;
+  scanStats: Record<string, number>;
+  summarized: number;
+  abstractsBackfilled: number;
+  backfilled: number;
+  s2Enriched: number;
+}
+
+async function buildResponse(startTime: number, r: StepResults) {
+  const [totals] = await db
+    .select({
+      total: sql<number>`count(*)`,
+      withAbstract: sql<number>`count(${researchCache.abstract})`,
+      withSummary: sql<number>`count(${researchCache.aiSummarySimple})`,
+      withS2Id: sql<number>`count(${researchCache.s2Id})`,
+    })
+    .from(researchCache);
+
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+  const result = {
+    newArticles: r.newCount,
+    sources: r.sourceCounts,
+    fullTextConclusions: r.fullTextCount,
+    scan: { inserted: r.scanInserted, ...r.scanStats },
+    summarized: r.summarized,
+    abstractsBackfilled: r.abstractsBackfilled,
+    oaBackfilled: r.backfilled,
+    s2Enriched: r.s2Enriched,
+    dbTotals: totals,
+    elapsedSeconds: Number(elapsed),
+  };
+
+  log('done', `Completed in ${elapsed}s`, result);
+  return NextResponse.json(result);
 }
 
 export async function POST(req: NextRequest) {
@@ -150,6 +196,10 @@ export async function POST(req: NextRequest) {
     log('step-2', `New articles inserted: ${newCount}`, { sourceCounts, fullTextCount });
 
     // ── 3. Historical scan: crawl each source progressively ─────────
+    if (!hasTimeLeft(startTime)) {
+      log('skip', `Skipping steps 3-7 — ${((Date.now() - startTime) / 1000).toFixed(0)}s elapsed`);
+      return buildResponse(startTime, { newCount, sourceCounts, fullTextCount, scanInserted: 0, scanStats: { pubmed: 0, europepmc: 0, semanticscholar: 0 }, summarized: 0, abstractsBackfilled: 0, backfilled: 0, s2Enriched: 0 });
+    }
     let scanInserted = 0;
     const scanStats = { pubmed: 0, europepmc: 0, semanticscholar: 0 };
 
@@ -305,6 +355,10 @@ export async function POST(req: NextRequest) {
     log('step-3', `Historical scan total: ${scanInserted} inserted`, scanStats);
 
     // ── 4. Backfill: unsummarized articles (max 20) ─────────────────
+    if (!hasTimeLeft(startTime)) {
+      log('skip', `Skipping steps 4-7 — ${((Date.now() - startTime) / 1000).toFixed(0)}s elapsed`);
+      return buildResponse(startTime, { newCount, sourceCounts, fullTextCount, scanInserted, scanStats, summarized: 0, abstractsBackfilled: 0, backfilled: 0, s2Enriched: 0 });
+    }
     let summarized = 0;
     const unsummarized = await db
       .select()
@@ -315,6 +369,10 @@ export async function POST(req: NextRequest) {
     log('step-4', `Found ${unsummarized.length} unsummarized articles`);
 
     for (let i = 0; i < unsummarized.length; i++) {
+      if (!hasTimeLeft(startTime)) {
+        log('step-4', `Time limit reached after ${summarized} summaries`);
+        break;
+      }
       const article = unsummarized[i];
       if (!article.abstract) continue;
       if (i > 0) await new Promise((r) => setTimeout(r, 4000));
@@ -342,6 +400,10 @@ export async function POST(req: NextRequest) {
     log('step-4', `Summarized ${summarized}/${unsummarized.length} articles`);
 
     // ── 5. Backfill: missing abstracts (max 10) ────────────────────
+    if (!hasTimeLeft(startTime)) {
+      log('skip', `Skipping steps 5-7 — ${((Date.now() - startTime) / 1000).toFixed(0)}s elapsed`);
+      return buildResponse(startTime, { newCount, sourceCounts, fullTextCount, scanInserted, scanStats, summarized, abstractsBackfilled: 0, backfilled: 0, s2Enriched: 0 });
+    }
     let abstractsBackfilled = 0;
     const missingAbstract = await db
       .select()
@@ -394,6 +456,10 @@ export async function POST(req: NextRequest) {
     log('step-5', `Backfilled ${abstractsBackfilled}/${missingAbstract.length} abstracts`);
 
     // ── 6. Backfill: OA status for old records (max 5) ──────────────
+    if (!hasTimeLeft(startTime)) {
+      log('skip', `Skipping steps 6-7 — ${((Date.now() - startTime) / 1000).toFixed(0)}s elapsed`);
+      return buildResponse(startTime, { newCount, sourceCounts, fullTextCount, scanInserted, scanStats, summarized, abstractsBackfilled, backfilled: 0, s2Enriched: 0 });
+    }
     let backfilled = 0;
     const missingOa = await db
       .select()
@@ -435,10 +501,14 @@ export async function POST(req: NextRequest) {
 
     log('step-6', `OA backfill: ${backfilled}/${missingOa.length}`);
 
-    // ── 7. S2 enrichment: refresh all articles via batch endpoint ────
+    // ── 7. S2 enrichment: incremental batch (max 500 per run) ────────
     let s2Enriched = 0;
-    if (process.env.S2_API_KEY) {
-      const allDbArticles = await db
+    if (!hasTimeLeft(startTime)) {
+      log('skip', `Skipping step 7 — ${((Date.now() - startTime) / 1000).toFixed(0)}s elapsed`);
+    } else if (process.env.S2_API_KEY) {
+      // Prioritize articles never enriched (no s2Id), then limit to 500
+      const S2_BATCH_LIMIT = 500;
+      const articlesToEnrich = await db
         .select({
           id: researchCache.id,
           doi: researchCache.doi,
@@ -446,9 +516,13 @@ export async function POST(req: NextRequest) {
           s2Id: researchCache.s2Id,
         })
         .from(researchCache)
-        .where(or(isNotNull(researchCache.doi), isNotNull(researchCache.pubmedId)));
+        .where(
+          or(isNotNull(researchCache.doi), isNotNull(researchCache.pubmedId))
+        )
+        .orderBy(sql`CASE WHEN ${researchCache.s2Id} IS NULL THEN 0 ELSE 1 END`)
+        .limit(S2_BATCH_LIMIT);
 
-      const lookupIds = allDbArticles
+      const lookupIds = articlesToEnrich
         .map((a) => ({
           inputId: a.id,
           s2Query: a.doi ? `DOI:${a.doi}` : `PMID:${a.pubmedId}`,
@@ -461,7 +535,11 @@ export async function POST(req: NextRequest) {
         const enrichMap = await batchLookupPapers(lookupIds);
         log('step-7', `S2 batch returned ${enrichMap.size} matches`);
 
-        for (const article of allDbArticles) {
+        for (const article of articlesToEnrich) {
+          if (!hasTimeLeft(startTime)) {
+            log('step-7', `Time limit reached after updating ${s2Enriched} articles`);
+            break;
+          }
           const enrichment = enrichMap.get(article.id);
           if (!enrichment) continue;
 
@@ -486,33 +564,7 @@ export async function POST(req: NextRequest) {
       log('step-7', 'S2 enrichment skipped — no S2_API_KEY');
     }
 
-    // ── DB totals ───────────────────────────────────────────────────
-    const [totals] = await db
-      .select({
-        total: sql<number>`count(*)`,
-        withAbstract: sql<number>`count(${researchCache.abstract})`,
-        withSummary: sql<number>`count(${researchCache.aiSummarySimple})`,
-        withS2Id: sql<number>`count(${researchCache.s2Id})`,
-      })
-      .from(researchCache);
-
-    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-
-    const result = {
-      newArticles: newCount,
-      sources: sourceCounts,
-      fullTextConclusions: fullTextCount,
-      scan: { inserted: scanInserted, ...scanStats },
-      summarized,
-      abstractsBackfilled,
-      oaBackfilled: backfilled,
-      s2Enriched,
-      dbTotals: totals,
-      elapsedSeconds: Number(elapsed),
-    };
-
-    log('done', `Completed in ${elapsed}s`, result);
-    return NextResponse.json(result);
+    return buildResponse(startTime, { newCount, sourceCounts, fullTextCount, scanInserted, scanStats, summarized, abstractsBackfilled, backfilled, s2Enriched });
   } catch (error) {
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
     log('error', `Fatal error after ${elapsed}s: ${error}`);

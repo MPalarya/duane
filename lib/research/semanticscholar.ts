@@ -9,12 +9,11 @@ const BATCH_FIELDS =
 
 let lastRequestTime = 0;
 
-async function throttle(): Promise<void> {
+async function throttle(minGapMs = 1050): Promise<void> {
   const now = Date.now();
   const elapsed = now - lastRequestTime;
-  if (elapsed < 1050) {
-    // 1050ms to stay safely under 1 req/s
-    await new Promise((r) => setTimeout(r, 1050 - elapsed));
+  if (elapsed < minGapMs) {
+    await new Promise((r) => setTimeout(r, minGapMs - elapsed));
   }
   lastRequestTime = Date.now();
 }
@@ -164,6 +163,9 @@ export async function batchLookupPapers(
   for (let i = 0; i < ids.length; i += 500) {
     const chunk = ids.slice(i, i + 500);
     const s2Ids = chunk.map((c) => c.s2Query);
+
+    // Extra gap before batch POSTs — these are heavier than search requests
+    if (i > 0) await throttle(3000);
 
     const res = await fetchWithRetry(`${S2_BASE}/paper/batch?fields=${BATCH_FIELDS}`, {
       method: 'POST',
