@@ -1,16 +1,8 @@
 import Link from 'next/link';
 import { AdvocateCarousel } from './advocate-carousel';
+import type { FeaturedAdvocate } from './advocate-carousel';
 
-export interface FeaturedAdvocate {
-  _id: string;
-  name: string;
-  tags?: string[];
-  bio?: string;
-  videoUrl: string;
-  directVideoUrl?: string;
-  thumbnailUrl?: string;
-  socialLinks?: { platform: string; url: string; followers?: string }[];
-}
+export type { FeaturedAdvocate };
 
 interface VisionariesSectionProps {
   advocates: FeaturedAdvocate[];

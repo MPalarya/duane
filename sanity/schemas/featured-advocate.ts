@@ -51,6 +51,9 @@ export const featuredAdvocate = defineType({
                   { title: 'TikTok', value: 'tiktok' },
                   { title: 'YouTube', value: 'youtube' },
                   { title: 'Twitter/X', value: 'twitter' },
+                  { title: 'LinkedIn', value: 'linkedin' },
+                  { title: 'Facebook', value: 'facebook' },
+                  { title: 'Website', value: 'website' },
                   { title: 'Other', value: 'other' },
                 ],
               },
@@ -61,6 +64,25 @@ export const featuredAdvocate = defineType({
               title: 'Followers',
               description: 'Formatted follower count, e.g. "155K" or "2.2M"',
               type: 'string',
+            },
+          ],
+        },
+      ],
+    }),
+    defineField({
+      name: 'additionalVideos',
+      title: 'Additional Videos',
+      description: 'Extra videos shown when the user clicks "Show more"',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'videoUrl',
+              title: 'Video Embed URL',
+              type: 'url',
+              validation: (Rule) => Rule.required(),
             },
           ],
         },

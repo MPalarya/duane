@@ -130,9 +130,23 @@ export default async function CommunityPage() {
   // Fetch video thumbnails for click-to-load previews (skip if already set in seed/Sanity data)
   enrichedAdvocates = await Promise.all(
     enrichedAdvocates.map(async (a) => {
-      if (a.thumbnailUrl) return a;
-      const thumbnailUrl = await fetchVideoThumbnail(a.videoUrl, a.socialLinks);
-      return thumbnailUrl ? { ...a, thumbnailUrl } : a;
+      // Main video thumbnail
+      const mainThumb = a.thumbnailUrl || (await fetchVideoThumbnail(a.videoUrl, a.socialLinks));
+      // Additional video thumbnails
+      const additionalVideos = a.additionalVideos?.length
+        ? await Promise.all(
+            a.additionalVideos.map(async (v) => {
+              if (v.thumbnailUrl) return v;
+              const thumb = await fetchVideoThumbnail(v.videoUrl, a.socialLinks);
+              return thumb ? { ...v, thumbnailUrl: thumb } : v;
+            }),
+          )
+        : a.additionalVideos;
+      return {
+        ...a,
+        ...(mainThumb ? { thumbnailUrl: mainThumb } : {}),
+        ...(additionalVideos ? { additionalVideos } : {}),
+      };
     }),
   );
   const posts = blogPosts?.length ? blogPosts : seedBlogPosts;

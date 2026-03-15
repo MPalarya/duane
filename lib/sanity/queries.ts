@@ -81,7 +81,8 @@ export const featuredAdvocatesQuery = groq`
     tags,
     bio,
     videoUrl,
-    socialLinks
+    socialLinks,
+    additionalVideos
   }
 `;
 

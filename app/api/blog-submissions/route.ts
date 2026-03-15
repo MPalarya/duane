@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
 import { db, isDbConfigured } from '@/lib/db/client';
-import { blogSubmissions } from '@/lib/db/schema';
+import { blogSubmissions, users } from '@/lib/db/schema';
 import { sendEmail } from '@/lib/email/client';
-import { desc } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 
 const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
@@ -31,6 +31,18 @@ export async function POST(req: NextRequest) {
     if (!isDbConfigured) {
       console.log('[Blog Submission]', { title, authorName });
       return NextResponse.json({ message: 'Submission received' });
+    }
+
+    // Ensure user row exists (FK constraint on blog_submissions.user_id)
+    const existing = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+    if (existing.length === 0) {
+      await db.insert(users).values({
+        id: user.id,
+        name: user.fullName || null,
+        email: user.emailAddresses?.[0]?.emailAddress || null,
+        image: user.imageUrl || null,
+        provider: 'clerk',
+      });
     }
 
     const id = crypto.randomUUID();

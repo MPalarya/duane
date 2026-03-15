@@ -339,10 +339,17 @@ export const seedFeaturedAdvocates = [
     name: 'Emily DiDonato',
     tags: ['Model'],
     bio: 'International model and content creator who has openly shared her experience with Duane Syndrome, helping normalize the condition in the public eye.',
-    videoUrl: 'https://www.tiktok.com/embed/7462404378872417582',
+    videoUrl: 'https://www.tiktok.com/embed/v2/7462404378872417582',
     socialLinks: [
       { platform: 'instagram', url: 'https://www.instagram.com/emilydidonato/' },
       { platform: 'tiktok', url: 'https://www.tiktok.com/@didonatoemily' },
+      { platform: 'youtube', url: 'https://www.youtube.com/c/EmilyDiDonato' },
+      { platform: 'facebook', url: 'https://www.facebook.com/emilydidonato/' },
+      { platform: 'website', url: 'https://www.emilydidonato.com' },
+    ],
+    additionalVideos: [
+      { videoUrl: 'https://www.tiktok.com/embed/v2/7528431774876175646' },
+      { videoUrl: 'https://www.tiktok.com/embed/v2/7485476662684044587' },
     ],
   },
   {
