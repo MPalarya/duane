@@ -111,6 +111,9 @@ export default function TreatmentsPage() {
         This information is for educational purposes. Treatment decisions should be made in
         consultation with a qualified ophthalmologist experienced with Duane Syndrome.
       </p>
+      <p className="mt-2 text-xs text-warm-400">
+        Last medically reviewed: January 2024
+      </p>
 
       {/* Find a Specialist CTA */}
       <div className="mt-8 rounded-xl border border-primary-200 bg-primary-50 p-6 text-center">

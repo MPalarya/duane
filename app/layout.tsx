@@ -39,9 +39,18 @@ export const metadata: Metadata = {
     locale: 'en_US',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Duane Syndrome - Global Information & Community Portal',
+    description:
+      'Comprehensive resource for Duane Syndrome patients, parents, and friends. Medical information, specialist directory, community support, and interactive tools.',
+  },
   robots: {
     index: true,
     follow: true,
+    'max-snippet': -1,
+    'max-image-preview': 'large' as const,
+    'max-video-preview': -1,
   },
 };
 
@@ -65,6 +74,30 @@ export default function RootLayout({
   const inner = (
     <html lang="en" dir="ltr" className={inter.variable}>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@graph': [
+                {
+                  '@type': 'Organization',
+                  name: 'Duane Syndrome Portal',
+                  url: 'https://duane-syndrome.com',
+                  logo: 'https://duane-syndrome.com/images/logo.png',
+                  description:
+                    'Comprehensive resource for Duane Syndrome patients, parents, and friends.',
+                },
+                {
+                  '@type': 'WebSite',
+                  name: 'Duane Syndrome Portal',
+                  alternateName: ['Duane Syndrome', 'DS Portal'],
+                  url: 'https://duane-syndrome.com/',
+                },
+              ],
+            }),
+          }}
+        />
         <InnerLayout>{children}</InnerLayout>
         <BottomNav />
         <ScrollToTop />

@@ -4,6 +4,38 @@ import { db, isDbConfigured } from '@/lib/db/client';
 import { specialists, reviews } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { Badge } from '@/components/ui/badge';
+import type { Metadata } from 'next';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+
+  if (!isDbConfigured) return {};
+
+  try {
+    const results = await db.select().from(specialists).where(eq(specialists.id, id)).limit(1);
+    const specialist = results[0];
+    if (!specialist) return {};
+
+    const location = [specialist.city, specialist.country].filter(Boolean).join(', ');
+    const title = specialist.name;
+    const description = `${specialist.name}${specialist.specialty ? ` — ${specialist.specialty}` : ''} specializing in Duane Syndrome${location ? ` in ${location}` : ''}. View reviews and contact information.`;
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title: `${title} | Duane Syndrome Specialists`,
+        description,
+      },
+    };
+  } catch {
+    return {};
+  }
+}
 
 export default async function SpecialistDetailPage({
   params,

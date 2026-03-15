@@ -1,8 +1,15 @@
+import type { Metadata } from 'next';
 import { db, isDbConfigured } from '@/lib/db/client';
 import { researchCache, researchComments, researchEngagement, researchLikes } from '@/lib/db/schema';
 import { and, desc, gt, gte, isNotNull, like, or, sql } from 'drizzle-orm';
 import { seedResearchPapers } from '@/lib/seed-data';
 import { ResearchPageClient, type ResearchPaper } from '@/components/content/research-page-client';
+
+export const metadata: Metadata = {
+  title: 'Research Papers',
+  description:
+    'Latest peer-reviewed research on Duane Syndrome with AI-generated plain-language summaries. Browse studies from PubMed, Europe PMC, and Semantic Scholar.',
+};
 
 export const dynamic = 'force-dynamic';
 

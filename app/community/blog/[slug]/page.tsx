@@ -31,9 +31,19 @@ export async function generateMetadata({
   const post = await safeFetch<BlogPost>(blogPostBySlugQuery, { slug, locale: 'en' });
   if (!post) return {};
 
+  const title = post.seoTitle || post.title;
+  const description = post.seoDescription || post.excerpt;
+
   return {
-    title: post.seoTitle || post.title,
-    description: post.seoDescription || post.excerpt,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+      publishedTime: post.publishedAt,
+      authors: post.author?.name ? [post.author.name] : undefined,
+    },
   };
 }
 
@@ -117,9 +127,15 @@ export default async function BlogPostPage({
             headline: post.title,
             description: post.excerpt,
             datePublished: post.publishedAt,
+            dateModified: post.publishedAt,
             author: post.author
               ? { '@type': 'Person', name: post.author.name }
               : undefined,
+            publisher: {
+              '@type': 'Organization',
+              name: 'Duane Syndrome Portal',
+              url: 'https://duane-syndrome.com',
+            },
           }),
         }}
       />

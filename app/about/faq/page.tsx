@@ -86,6 +86,9 @@ export default function FaqPage() {
       <p className="mt-8 text-sm text-warm-400 italic">
         This information is for educational purposes only and should not replace professional medical advice.
       </p>
+      <p className="mt-2 text-xs text-warm-400">
+        Last medically reviewed: January 2024
+      </p>
 
       {/* FAQPage Schema */}
       <script

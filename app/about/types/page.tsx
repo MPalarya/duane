@@ -104,6 +104,9 @@ export default function TypesPage() {
       <p className="mt-8 text-sm text-warm-400 italic">
         This information is for educational purposes. Consult an ophthalmologist for diagnosis and management.
       </p>
+      <p className="mt-2 text-xs text-warm-400">
+        Last medically reviewed: January 2024
+      </p>
 
       {/* Structured Data */}
       <script
