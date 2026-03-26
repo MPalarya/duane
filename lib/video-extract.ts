@@ -153,6 +153,9 @@ export async function fetchVideoThumbnail(
     if (embedUrl.includes('instagram.com') && embedUrl.includes('/embed')) {
       return await fetchInstagramThumbnail(embedUrl);
     }
+    if (embedUrl.includes('youtube.com/embed') || embedUrl.includes('youtube.com/watch')) {
+      return fetchYouTubeThumbnail(embedUrl);
+    }
     return null;
   } catch {
     return null;
@@ -183,13 +186,16 @@ async function fetchTikTokThumbnail(
 }
 
 async function fetchInstagramThumbnail(embedUrl: string): Promise<string | null> {
-  const reelMatch = embedUrl.match(/reel\/([^/]+)/);
-  if (!reelMatch) return null;
+  // Support both /reel/CODE/embed/ and /p/CODE/embed/
+  const codeMatch = embedUrl.match(/(?:reel|p)\/([^/]+)/);
+  if (!codeMatch) return null;
 
-  // Instagram's oembed API requires auth now — fetch the reel page
-  // and extract the og:image meta tag instead
-  const pageUrl = `https://www.instagram.com/reel/${reelMatch[1]}/`;
-  const res = await fetch(pageUrl, {
+  // Instagram's CDN serves thumbnails via the embed page itself.
+  // Fetch the embed page (not the main page — embeds are less restricted)
+  // and extract the background image or og:image from it.
+  const type = embedUrl.includes('/reel/') ? 'reel' : 'p';
+  const embedPageUrl = `https://www.instagram.com/${type}/${codeMatch[1]}/embed/`;
+  const res = await fetch(embedPageUrl, {
     headers: {
       'User-Agent': UA,
       Accept: 'text/html,application/xhtml+xml',
@@ -201,8 +207,30 @@ async function fetchInstagramThumbnail(embedUrl: string): Promise<string | null>
   if (!res.ok) return null;
   const html = await res.text();
 
+  // The embed page includes the image in several places:
+  // 1. class="EmbeddedMediaImage" with src="..."
+  const imgTag = html.match(/class="EmbeddedMediaImage"[^>]*src="([^"]+)"/);
+  if (imgTag) return decodeEntities(imgTag[1]);
+
+  // 2. og:image meta tag
   const ogImage = html.match(/<meta property="og:image" content="([^"]+)"/);
   if (ogImage) return decodeEntities(ogImage[1]);
 
+  // 3. Any instagram CDN image URL in the page
+  const cdnMatch = html.match(/(https:\/\/scontent[^"'\s]+\.jpg[^"'\s]*)/);
+  if (cdnMatch) return decodeEntities(cdnMatch[1]);
+
   return null;
+}
+
+function fetchYouTubeThumbnail(embedUrl: string): string | null {
+  // Extract video ID from embed or watch URL
+  const embedMatch = embedUrl.match(/youtube\.com\/embed\/([^?/]+)/);
+  const watchMatch = embedUrl.match(/youtube\.com\/watch\?v=([^&]+)/);
+  const videoId = embedMatch?.[1] || watchMatch?.[1];
+  if (!videoId) return null;
+
+  // YouTube provides deterministic thumbnail URLs — no fetch needed
+  // maxresdefault is highest quality, falls back gracefully in browsers
+  return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 }

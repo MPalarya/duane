@@ -82,50 +82,6 @@ export const seedSpecialists = [
   },
 ];
 
-export const seedStories = [
-  {
-    id: 'seed-story-1',
-    title: 'From Shy Kid to Commercial Pilot',
-    profession: 'Commercial Airline Pilot',
-    content: `I was diagnosed with Duane Syndrome Type 1 in my left eye when I was 3 years old. Growing up, I was always worried it would limit my career options — especially my dream of becoming a pilot.
-
-When I was 16, I researched aviation medical requirements obsessively. I found out that most aviation authorities evaluate functional vision, not just eye movement range. I could see 20/20, had good depth perception, and passed the visual field tests.
-
-After getting my medical certificate (which required a special issuance review), I completed flight training and am now a first officer at a regional airline. I fly every day and my Duane Syndrome has never been an issue in the cockpit.
-
-To anyone with DS who dreams of flying: get your eyes evaluated by an aviation medical examiner early. The process takes longer but it's absolutely possible.`,
-    createdAt: '2024-11-15',
-  },
-  {
-    id: 'seed-story-2',
-    title: 'My Daughter\'s Journey: From Diagnosis to Confidence',
-    profession: 'Parent',
-    content: `When our daughter Maya was 18 months old, we noticed she always turned her head to the left. Our pediatrician referred us to a pediatric ophthalmologist who diagnosed her with Duane Syndrome Type 1 in the right eye.
-
-I remember crying in the car afterward — not because it was serious, but because I'd never heard of it and the unknown was terrifying. I wish I'd had a resource like this site back then.
-
-Maya is now 11. She had strabismus surgery at age 5 to correct a significant head turn, and the results were great. She plays soccer, does gymnastics, reads voraciously, and just started learning guitar. Her confidence is through the roof.
-
-The biggest thing I've learned: Duane Syndrome is something Maya HAS, not something she IS. We've taught her to explain it casually and she handles questions with incredible grace. Her eye doctor says he barely notices her DS anymore.
-
-To the parents reading this in tears after a fresh diagnosis: I promise, it gets easier. Your child will be just fine.`,
-    createdAt: '2024-09-20',
-  },
-  {
-    id: 'seed-story-3',
-    title: 'Eye Surgeon with an Eye Condition',
-    profession: 'Ophthalmologist',
-    content: `Here's a bit of irony: I'm an ophthalmologist with Duane Syndrome Type 3. Both eyes affected, though the left is more limited.
-
-I went through medical school, residency, and a fellowship in oculoplastic surgery — all with DS. Operating through a microscope requires adaptation, but I found my natural head position and it works perfectly.
-
-What drove me into ophthalmology? Honestly, curiosity about my own condition. When I was a kid, no doctor could explain DS in a way I could understand. I wanted to be the doctor who could.
-
-Now I specialize in helping patients with complex strabismus conditions. Having DS myself gives me a unique perspective that my patients appreciate. When I tell them I have the same condition, their relief is visible.`,
-    createdAt: '2025-01-05',
-  },
-];
-
 export const seedMentorPosts = [
   {
     id: 'seed-mentor-1',
@@ -337,52 +293,89 @@ export const seedFeaturedAdvocates = [
   {
     _id: 'emily-didonato',
     name: 'Emily DiDonato',
-    tags: ['Model'],
-    bio: 'International model and content creator who has openly shared her experience with Duane Syndrome, helping normalize the condition in the public eye.',
+    tags: ['Model', 'Content Creator'],
+    bio: '"It\'s hilarious, I have DS -- these eyes don\'t work, but they\'ve made me a lot of money."',
     videoUrl: 'https://www.tiktok.com/embed/v2/7462404378872417582',
     socialLinks: [
       { platform: 'instagram', url: 'https://www.instagram.com/emilydidonato/' },
       { platform: 'tiktok', url: 'https://www.tiktok.com/@didonatoemily' },
       { platform: 'youtube', url: 'https://www.youtube.com/c/EmilyDiDonato' },
       { platform: 'facebook', url: 'https://www.facebook.com/emilydidonato/' },
+      { platform: 'linkedin', url: 'https://www.linkedin.com/in/emily-didonato-9217a6194/' },
+      { platform: 'spotify', url: 'https://open.spotify.com/show/7budv11WXB7XG8IcC419q3?si=0a35d0f0e2954861' },
       { platform: 'website', url: 'https://www.emilydidonato.com' },
     ],
     additionalVideos: [
       { videoUrl: 'https://www.tiktok.com/embed/v2/7528431774876175646' },
       { videoUrl: 'https://www.tiktok.com/embed/v2/7485476662684044587' },
+      { videoUrl: 'https://www.tiktok.com/embed/v2/7377015817407565102' },
     ],
   },
   {
     _id: 'grace-mckagan',
     name: 'Grace McKagan',
     tags: ['Musician'],
-    bio: 'Grace has spoken publicly about living with Duane Syndrome, helping raise awareness through her platform and inspiring others in the DS community.',
-    videoUrl: 'https://www.tiktok.com/embed/7565165321137474830',
+    bio: '"That\'s why David Bowie is one of my heroes, because he has two different colored eyes."',
+    videoUrl: 'https://www.tiktok.com/embed/v2/7250124664121445675',
     socialLinks: [
       { platform: 'instagram', url: 'https://www.instagram.com/gracemckagan/' },
       { platform: 'tiktok', url: 'https://www.tiktok.com/@gracemckagan97' },
+      { platform: 'youtube', url: 'https://www.youtube.com/channel/UCbCq4qCBNHaHpLKTCoIy6XA' },
+      { platform: 'spotify', url: 'https://open.spotify.com/artist/763Ta6J2nC9dvVG4D8XuPg' },
+    ],
+    additionalVideos: [
+      { videoUrl: 'https://www.tiktok.com/embed/v2/7565165321137474830' },
     ],
   },
   {
     _id: 'michelle-yates',
     name: 'Michelle Yates',
     tags: ['Nutritionist', 'Podcaster'],
-    bio: 'Nutrition expert and content creator who shares her experience with Duane Syndrome, bringing visibility to the condition through her wellness-focused content.',
+    bio: '"I refused to talk about it, until now."',
     videoUrl: 'https://www.tiktok.com/embed/7161971837335883051',
     socialLinks: [
       { platform: 'instagram', url: 'https://www.instagram.com/yatesnutrition/' },
       { platform: 'tiktok', url: 'https://www.tiktok.com/@yatesnutrition' },
+      { platform: 'youtube', url: 'https://www.youtube.com/@yatesnutrition' },
+      { platform: 'spotify', url: 'https://open.spotify.com/show/52c0S8IxWa2KeF4LgB1LXP' },
+      { platform: 'apple_podcasts', url: 'https://podcasts.apple.com/us/podcast/nourished-free-the-podcast/id1607397997' },
+      { platform: 'linkedin', url: 'https://www.linkedin.com/in/michelleyatesrd/' },
+      { platform: 'website', url: 'https://yatesnutrition.com/' },
     ],
   },
   {
     _id: 'poonam-nathu',
     name: 'Dr. Poonam Nathu',
-    tags: ['Doctor'],
-    bio: 'Neuro-vision specialist who educates about Duane Syndrome and other vision conditions through her practice and social media presence.',
-    videoUrl: 'https://www.instagram.com/reel/CwqHZc7p-29/embed/',
-    thumbnailUrl: 'https://scontent-mrs2-3.cdninstagram.com/v/t51.71878-15/496827558_659908083495979_6216036024076039258_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=0UzW93XbWQMQ7kNvwHEi1F-&_nc_oc=AdkxHnrXNIwAe5GRs6YlDaTGyknHSr4_f4lY9_1SqLdlmFo6PkzP9bdytKQIvUTmfJQ&_nc_zt=23&_nc_ht=scontent-mrs2-3.cdninstagram.com&_nc_gid=sXkDpg_J6z6T6hiWf8ZoYQ&_nc_ss=8&oh=00_AfxSOaXZ9cVdqSC3wITNlY1qsOXulwcR07_pP0uqxKwpKw&oe=69BB0DBE',
+    tags: ['Neuro-Optometrist', 'Duane Mom'],
+    bio: '"It\'s a big part of who I am and why I do what I do."',
+    videoUrl: 'https://www.tiktok.com/embed/v2/7581907851329719583',
     socialLinks: [
       { platform: 'instagram', url: 'https://www.instagram.com/theneurovisiondoc/' },
+      { platform: 'tiktok', url: 'https://www.tiktok.com/@theneurovisiondoc' },
+      { platform: 'facebook', url: 'https://www.facebook.com/TheVisionaryOD/' },
+      { platform: 'linkedin', url: 'https://www.linkedin.com/in/poonam-nathu-ab5a9971/' },
+      { platform: 'website', url: 'https://www.neurovisioncenternca.com/' },
+    ],
+    additionalVideos: [
+      { videoUrl: 'https://www.tiktok.com/embed/v2/7606167033926962462' },
+      { videoUrl: 'https://www.youtube.com/embed/pVKoEn5SiH8' },
+      { videoUrl: 'https://www.instagram.com/p/DUFEaXhkSzC/embed/' },
+      { videoUrl: 'https://www.instagram.com/reel/CwqHZc7p-29/embed/' },
+    ],
+  },
+  {
+    _id: 'piper-armstrong',
+    name: 'Piper Armstrong',
+    tags: ['Model', 'Content Creator'],
+    bio: '"Just nice to know there\'s actually other people with this."',
+    videoUrl: 'https://www.tiktok.com/embed/v2/7614281239536667912',
+    socialLinks: [
+      { platform: 'instagram', url: 'https://www.instagram.com/piperlucyarmstrong/' },
+      { platform: 'tiktok', url: 'https://www.tiktok.com/@piperlucyarmstrong' },
+      { platform: 'linkedin', url: 'https://www.linkedin.com/in/piper-armstrong/' },
+    ],
+    additionalVideos: [
+      { videoUrl: 'https://www.tiktok.com/embed/v2/7612844987872447762' },
     ],
   },
 ];

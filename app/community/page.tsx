@@ -5,21 +5,20 @@ import {
   communityLinksQuery,
 } from '@/lib/sanity/queries';
 import { db, isDbConfigured } from '@/lib/db/client';
-import { stories, mentorPosts } from '@/lib/db/schema';
+import { mentorPosts } from '@/lib/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { fetchFollowerCount } from '@/lib/social-stats';
 import { fetchVideoThumbnail } from '@/lib/video-extract';
 import {
   seedFeaturedAdvocates,
   seedBlogPosts,
-  seedStories,
   seedMentorPosts,
   seedCommunityLinks,
   seedPodcasts,
 } from '@/lib/seed-data';
 import { StickyNav } from '@/components/community/sticky-nav';
-import { VisionariesSection } from '@/components/community/visionaries-section';
-import type { FeaturedAdvocate } from '@/components/community/visionaries-section';
+import { AdvocatesSection } from '@/components/community/advocates-section';
+import type { FeaturedAdvocate } from '@/components/community/advocates-section';
 import { StoryLibrary } from '@/components/community/story-library';
 import { NoteBoard } from '@/components/community/note-board';
 import { PodcastsSection } from '@/components/community/podcasts-section';
@@ -34,14 +33,6 @@ interface BlogPost {
   readingTime?: number;
   tags?: string[];
   author?: { name: string };
-}
-
-interface Story {
-  id: string;
-  title: string;
-  profession: string | null;
-  content: string;
-  createdAt: string | null;
 }
 
 interface MentorPost {
@@ -82,19 +73,6 @@ async function enrichWithFollowerCounts(
   );
 }
 
-async function fetchStoriesFromDb(): Promise<Story[]> {
-  if (!isDbConfigured) return [];
-  try {
-    return await db
-      .select()
-      .from(stories)
-      .where(eq(stories.approved, true))
-      .orderBy(desc(stories.createdAt));
-  } catch {
-    return [];
-  }
-}
-
 async function fetchMentorPostsFromDb(): Promise<MentorPost[]> {
   if (!isDbConfigured) return [];
   try {
@@ -112,13 +90,11 @@ export default async function CommunityPage() {
   const [
     advocates,
     blogPosts,
-    dbStories,
     dbMentorPosts,
     communityLinks,
   ] = await Promise.all([
     safeFetch<FeaturedAdvocate[]>(featuredAdvocatesQuery, { locale: 'en' }),
     safeFetch<BlogPost[]>(allBlogPostsQuery, { locale: 'en' }),
-    fetchStoriesFromDb(),
     fetchMentorPostsFromDb(),
     safeFetch<CommunityLink[]>(communityLinksQuery, { locale: 'en' }),
   ]);
@@ -150,7 +126,6 @@ export default async function CommunityPage() {
     }),
   );
   const posts = blogPosts?.length ? blogPosts : seedBlogPosts;
-  const allStories = dbStories.length > 0 ? dbStories : seedStories;
   const allMentorPosts = dbMentorPosts.length > 0 ? dbMentorPosts : seedMentorPosts;
   const links = communityLinks?.length ? communityLinks : seedCommunityLinks;
   const podcasts = seedPodcasts;
@@ -159,14 +134,14 @@ export default async function CommunityPage() {
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-warm-900">Community</h1>
       <p className="mt-4 text-warm-600">
-        Your hub for everything Duane Syndrome — stories, mentors, podcasts, and connections.
+        Your hub for everything Duane Syndrome — blog posts, mentors, podcasts, and connections.
       </p>
 
       <StickyNav />
 
       <div className="mt-8 space-y-16">
-        <VisionariesSection advocates={enrichedAdvocates} />
-        <StoryLibrary blogPosts={posts} stories={allStories} />
+        <AdvocatesSection advocates={enrichedAdvocates} />
+        <StoryLibrary blogPosts={posts} />
         <NoteBoard posts={allMentorPosts} />
         {/* Podcasts + Groups side by side on desktop */}
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-8">

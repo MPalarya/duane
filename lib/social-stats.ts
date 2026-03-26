@@ -66,6 +66,33 @@ async function fetchTikTokFollowers(profileUrl: string): Promise<string | null> 
   return null;
 }
 
+async function fetchYouTubeSubscribers(channelUrl: string): Promise<string | null> {
+  const res = await fetch(channelUrl, {
+    headers: {
+      'User-Agent':
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+      Accept: 'text/html',
+      'Accept-Language': 'en-US,en;q=0.9',
+    },
+    next: { revalidate: 86400 },
+    signal: AbortSignal.timeout(5000),
+  });
+
+  if (!res.ok) return null;
+  const html = await res.text();
+
+  // YouTube embeds subscriber count in JSON-LD or page metadata
+  // Pattern: "subscriberCountText":"1.23M subscribers"
+  const match = html.match(/"subscriberCountText"\s*:\s*"([\d.]+[KMB]?\s*subscribers?)"/i);
+  if (match) return match[1].replace(/\s*subscribers?/i, '').trim();
+
+  // Fallback: og:description often contains "X subscribers"
+  const ogMatch = html.match(/([\d.]+[KMB]?)\s+subscribers/i);
+  if (ogMatch) return ogMatch[1];
+
+  return null;
+}
+
 export async function fetchFollowerCount(profileUrl: string): Promise<string | null> {
   try {
     if (profileUrl.includes('instagram.com')) {
@@ -73,6 +100,9 @@ export async function fetchFollowerCount(profileUrl: string): Promise<string | n
     }
     if (profileUrl.includes('tiktok.com')) {
       return await fetchTikTokFollowers(profileUrl);
+    }
+    if (profileUrl.includes('youtube.com') || profileUrl.includes('youtu.be')) {
+      return await fetchYouTubeSubscribers(profileUrl);
     }
     return null;
   } catch {

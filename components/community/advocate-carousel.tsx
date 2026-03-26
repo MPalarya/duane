@@ -37,123 +37,127 @@ function AdvocateCard({
   isExpanded?: boolean;
   onToggleExpand?: () => void;
 }) {
-  const [activated, setActivated] = useState(false);
+  // Auto-activate if no thumbnail available (e.g. Instagram embeds)
+  const [activated, setActivated] = useState(!advocate.thumbnailUrl);
 
   if (!advocate.videoUrl) return null;
 
   return (
     <div className="w-[325px] flex-shrink-0">
-      {activated ? (
-        <iframe
-          src={advocate.videoUrl}
-          width={325}
-          height={750}
-          className="rounded-xl border-0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          title={`Video featuring ${advocate.name}`}
-        />
-      ) : (
-        <button
-          onClick={() => setActivated(true)}
-          className="group relative h-[750px] w-[325px] overflow-hidden rounded-xl bg-black text-left"
-        >
-          {/* Thumbnail */}
-          {advocate.thumbnailUrl && (
-            <img
-              src={advocate.thumbnailUrl}
-              alt={advocate.name}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-          )}
+      <div
+        className="group relative h-[750px] w-[325px] overflow-hidden rounded-xl bg-black text-left"
+      >
+        {/* Video iframe (loads behind overlay when activated) */}
+        {activated && (
+          <iframe
+            src={advocate.videoUrl}
+            width={325}
+            height={750}
+            className="absolute inset-0 h-full w-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title={`Video featuring ${advocate.name}`}
+          />
+        )}
 
-          {/* Play button */}
-          <div className="absolute inset-0 flex items-center justify-center">
+        {/* Thumbnail (hidden when activated) */}
+        {!activated && advocate.thumbnailUrl && (
+          <img
+            src={advocate.thumbnailUrl}
+            alt={advocate.name}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
+
+        {/* Play button (hidden when activated) */}
+        {!activated && (
+          <button
+            onClick={() => setActivated(true)}
+            className="absolute inset-0 z-10 flex items-center justify-center"
+          >
             <div className="rounded-full bg-black/40 p-5 backdrop-blur-sm transition-transform group-hover:scale-110">
               <svg className="h-12 w-12 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
               </svg>
             </div>
-          </div>
+          </button>
+        )}
 
-          {/* Bottom gradient with metadata */}
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-4 pb-4 pt-24">
-            <p className="text-base font-bold text-white drop-shadow-sm">{advocate.name}</p>
+        {/* Bottom gradient with metadata — always visible */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-4 pb-4 pt-24">
+          <p className="text-base font-bold text-white drop-shadow-sm">{advocate.name}</p>
 
-            {/* Bio (main cards only) */}
-            {showMeta && advocate.bio && (
-              <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-white/80">
-                {advocate.bio}
-              </p>
-            )}
+          {/* Bio (main cards only) */}
+          {showMeta && advocate.bio && (
+            <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-white/80">
+              {advocate.bio}
+            </p>
+          )}
 
-            {/* Tags */}
-            {showMeta && advocate.tags && advocate.tags.length > 0 && (
-              <div className="mt-1.5 flex flex-wrap gap-1.5">
-                {advocate.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium text-white/90"
+          {/* Tags */}
+          {showMeta && advocate.tags && advocate.tags.length > 0 && (
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {advocate.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium text-white/90"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Social links with follower counts + extra videos toggle */}
+          {showMeta && (
+            <div className="pointer-events-auto mt-2 flex flex-wrap items-center gap-1.5">
+              {advocate.socialLinks?.map((link) => {
+                const config = platformConfig[link.platform];
+                if (!config) return null;
+                return (
+                  <a
+                    key={link.url}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 rounded-full bg-white/15 px-2 py-0.5 text-[11px] text-white/90 backdrop-blur-sm transition-colors hover:bg-white/30"
+                    onClick={(e) => e.stopPropagation()}
+                    title={`${config.label}${link.followers ? ` - ${link.followers} followers` : ''}`}
                   >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Social links with follower counts */}
-            {showMeta && advocate.socialLinks && advocate.socialLinks.length > 0 && (
-              <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                {advocate.socialLinks.map((link) => {
-                  const config = platformConfig[link.platform];
-                  if (!config) return null;
-                  return (
-                    <a
-                      key={link.url}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 rounded-full bg-white/15 px-2 py-0.5 text-[11px] text-white/90 backdrop-blur-sm transition-colors hover:bg-white/30"
-                      onClick={(e) => e.stopPropagation()}
-                      title={`${config.label}${link.followers ? ` - ${link.followers} followers` : ''}`}
-                    >
-                      <span className="text-white [&_svg]:h-3 [&_svg]:w-3">{config.icon}</span>
-                      {link.followers && <span>{link.followers}</span>}
-                    </a>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Show more / less toggle */}
-            {showMeta && extraCount > 0 && onToggleExpand && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleExpand();
-                }}
-                className="mt-2.5 flex items-center gap-1.5 rounded-full bg-primary-500/80 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm transition-colors hover:bg-primary-500"
-              >
-                {isExpanded ? (
-                  <>
-                    <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
-                      <path d="M15 18l-6-6 6-6" />
-                    </svg>
-                    Show less
-                  </>
-                ) : (
-                  <>
-                    <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
-                      <path d="M9 18l6-6-6-6" />
-                    </svg>
-                    +{extraCount} more video{extraCount > 1 ? 's' : ''}
-                  </>
-                )}
-              </button>
-            )}
-          </div>
-        </button>
-      )}
+                    <span className="text-white [&_svg]:h-3 [&_svg]:w-3">{config.icon}</span>
+                    {link.followers && <span>{link.followers}</span>}
+                  </a>
+                );
+              })}
+              {extraCount > 0 && onToggleExpand && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleExpand();
+                  }}
+                  className="flex cursor-pointer items-center gap-1 rounded-full bg-primary-500/80 px-2.5 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm transition-colors hover:bg-primary-500"
+                >
+                  {isExpanded ? (
+                    <>
+                      <svg className="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
+                        <path d="M15 18l-6-6 6-6" />
+                      </svg>
+                      Less
+                    </>
+                  ) : (
+                    <>
+                      <svg className="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
+                        <path d="M9 18l6-6-6-6" />
+                      </svg>
+                      +{extraCount} video{extraCount > 1 ? 's' : ''}
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -190,7 +194,7 @@ export function AdvocateCarousel({
         <button
           onClick={() => scroll('left')}
           aria-label="Previous"
-          className="rounded-full border border-warm-200 bg-white p-1.5 shadow-sm transition-colors hover:bg-warm-50"
+          className="hidden rounded-full border border-warm-200 bg-white p-1.5 shadow-sm transition-colors hover:bg-warm-50 md:inline-flex"
         >
           <svg className="h-4 w-4 text-warm-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
@@ -199,12 +203,13 @@ export function AdvocateCarousel({
         <button
           onClick={() => scroll('right')}
           aria-label="Next"
-          className="rounded-full border border-warm-200 bg-white p-1.5 shadow-sm transition-colors hover:bg-warm-50"
+          className="hidden rounded-full border border-warm-200 bg-white p-1.5 shadow-sm transition-colors hover:bg-warm-50 md:inline-flex"
         >
           <svg className="h-4 w-4 text-warm-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 18l6-6-6-6" />
           </svg>
         </button>
+        <div className="flex-1" />
         {trailing}
       </div>
 
@@ -226,31 +231,45 @@ export function AdvocateCarousel({
                 onToggleExpand={() => handleToggle(advocate._id)}
               />
               <AnimatePresence>
-                {isExpanded &&
-                  extras.map((video, i) => (
-                    <motion.div
-                      key={`${advocate._id}-extra-${i}`}
-                      initial={{ width: 0, opacity: 0 }}
-                      animate={{ width: CARD_W, opacity: 1 }}
-                      exit={{ width: 0, opacity: 0 }}
-                      transition={{
+                {isExpanded && extras.length > 0 && (
+                  <motion.div
+                    key={`${advocate._id}-extras`}
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{
+                      width: extras.length * CARD_W + (extras.length - 1) * GAP,
+                      opacity: 1,
+                      transition: {
                         type: 'spring',
                         stiffness: 300,
                         damping: 30,
-                        delay: i * 0.08,
-                      }}
-                      className="flex-shrink-0 overflow-hidden"
-                    >
-                      <AdvocateCard
-                        advocate={{
-                          ...advocate,
-                          videoUrl: video.videoUrl,
-                          thumbnailUrl: video.thumbnailUrl,
-                        }}
-                        showMeta={false}
-                      />
-                    </motion.div>
-                  ))}
+                      },
+                    }}
+                    exit={{
+                      width: 0,
+                      opacity: 0,
+                      transition: {
+                        type: 'spring',
+                        stiffness: 400,
+                        damping: 35,
+                      },
+                    }}
+                    className="flex-shrink-0 overflow-hidden"
+                  >
+                    <div className="flex" style={{ gap: GAP }}>
+                      {extras.map((video, i) => (
+                        <AdvocateCard
+                          key={`${advocate._id}-extra-${i}`}
+                          advocate={{
+                            ...advocate,
+                            videoUrl: video.videoUrl,
+                            thumbnailUrl: video.thumbnailUrl,
+                          }}
+                          showMeta={false}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
               </AnimatePresence>
             </Fragment>
           );

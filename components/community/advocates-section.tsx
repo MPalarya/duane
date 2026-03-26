@@ -4,16 +4,18 @@ import type { FeaturedAdvocate } from './advocate-carousel';
 
 export type { FeaturedAdvocate };
 
-interface VisionariesSectionProps {
+interface AdvocatesSectionProps {
   advocates: FeaturedAdvocate[];
 }
 
-export function VisionariesSection({ advocates }: VisionariesSectionProps) {
+export function AdvocatesSection({ advocates }: AdvocatesSectionProps) {
   return (
     <section id="spotlights">
-      <h2 className="text-2xl font-bold text-warm-900">Visionaries</h2>
+      <h2 className="text-2xl font-bold text-warm-900">Advocates</h2>
       <p className="mt-2 text-warm-500">
         Inspiring people who have Duane Syndrome — proving it doesn&apos;t define or limit what you can achieve.
+        <br />
+        Listen to their stories, browse through the comments — it&apos;s much more common than you think.
       </p>
 
       {advocates.length > 0 && (

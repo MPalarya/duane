@@ -8,7 +8,6 @@ import { Select } from '@/components/ui/select';
 
 const submissionTypes = [
   { value: 'specialist', label: 'Suggest a Specialist' },
-  { value: 'story', label: 'Share Your Story' },
   { value: 'blog', label: 'Submit a Blog Post' },
   { value: 'spotlight', label: 'Suggest a Spotlight Person' },
   { value: 'resource', label: 'Suggest a Resource' },
@@ -101,14 +100,6 @@ export function SubmissionForm() {
           <Input id="specialty" name="specialty" label="Specialty" placeholder="e.g., Strabismus Surgery" />
           <Input id="website" name="specialistWebsite" label="Website" type="url" />
           <Textarea id="notes" name="notes" label="Additional Notes" />
-        </>
-      )}
-
-      {type === 'story' && (
-        <>
-          <Input id="title" name="title" label="Story Title" required />
-          <Input id="profession" name="profession" label="Your Profession (optional)" />
-          <Textarea id="content" name="content" label="Your Story" required rows={8} />
         </>
       )}
 
